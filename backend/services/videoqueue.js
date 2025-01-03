@@ -18,7 +18,7 @@ const videoQueue = new Queue("video processing", {
     stalledInterval: 1000 * 60 * 5, // Check for stalled jobs every 5 minutes
     lockDuration: 1000 * 60 * 10, // Lock duration of 10 minutes
     maxStalledCount: 3, // Retry a stalled job 3 times
-    maxConcurrency: 10, // Limit the number of concurrent jobs to 10
+    maxConcurrency: 40, // Limit the number of concurrent jobs to 10
   },
 });
 
