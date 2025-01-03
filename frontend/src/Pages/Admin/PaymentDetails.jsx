@@ -15,7 +15,7 @@ const PaymentDetailsPage = () => {
     queryFn: async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8081/api/payment/payment/full`,
+          `https://streamify-694k.onrender.com/api/payment/payment/full`,
           { withCredentials: true }
         );
         return response.data.items || [];
