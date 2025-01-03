@@ -18,7 +18,7 @@ import axios from "@/utils/axios";
 
 // Function to handle report submission API call
 const submitReport = async (reportData) => {
-  const response = await axios.post("/admin/reports/report", reportData);
+  const response = await axios.post("https://streamify-694k.onrender.com/admin/reports/report", reportData);
   return response.data;
 };
 
