@@ -11,7 +11,7 @@ import { User } from "lucide-react";
 const fetchUserDetails = async (planId) => {
   if (!planId) return null;
   const response = await fetch(
-    `http://localhost:8081/api/payment/plans/${planId}/createdBy`,
+    `https://streamify-694k.onrender.com/api/payment/plans/${planId}/createdBy`,
     {
       credentials: "include",
     }
