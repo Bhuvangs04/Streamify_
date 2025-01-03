@@ -26,7 +26,7 @@ export default function ForgetPage() {
     setErrorMessage("");
 
     try {
-      await axios.post("http://localhost:8081/api/user/forgot-password", {
+      await axios.post("https://streamify-694k.onrender.com/api/user/forgot-password", {
         email,
       });
       setIsSuccess(true);
