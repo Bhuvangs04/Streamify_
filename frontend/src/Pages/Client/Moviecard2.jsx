@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"; // Import Button component
 import { ChevronDown, ChevronUp, Play } from "lucide-react"; // Import icons
 import axios from "axios"; // Axios for API calls
 
-export function MovieCard({ movie, onPlay, onRemove }) {
+export function MovieCardMain2({ movie, onPlay, onRemove }) {
   const [showDescription, setShowDescription] = useState(false);
   const [removing, setRemoving] = useState(false); // Track removal state
 
