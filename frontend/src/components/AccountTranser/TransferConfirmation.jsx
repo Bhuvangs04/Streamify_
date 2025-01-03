@@ -24,7 +24,7 @@ export default function TransferConfirmation({
 
     try {
       const response = await fetch(
-        "http://localhost:8081/api/user/update/transfer/currentuser", // Removed extra space
+        "https://streamify-694k.onrender.com/api/user/update/transfer/currentuser", // Removed extra space
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
