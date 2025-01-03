@@ -1,11 +1,14 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+import tailwindcssAnimate from "tailwindcss-animate";
+import tailwindScrollbarHide from "tailwind-scrollbar-hide";
+
+export default {
   darkMode: ["class"],
   content: [
-    "./pages/**/*.{js,jsx}", // Updated for JSX
-    "./components/**/*.{js,jsx}", // Updated for JSX
-    "./app/**/*.{js,jsx}", // Updated for JSX
-    "./src/**/*.{js,jsx}", // Updated for JSX
+    "./pages/**/*.{js,jsx}",
+    "./components/**/*.{js,jsx}",
+    "./app/**/*.{js,jsx}",
+    "./src/**/*.{js,jsx}",
   ],
   prefix: "",
   theme: {
@@ -84,7 +87,7 @@ module.exports = {
     },
   },
   plugins: [
-    require("tailwindcss-animate"),
-    require("tailwind-scrollbar-hide"), // Added plugin
+    tailwindcssAnimate,
+    tailwindScrollbarHide, // Added plugin
   ],
 };

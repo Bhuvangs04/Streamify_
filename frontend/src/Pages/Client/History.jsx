@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { MovieCard } from "./MovieCard";
+import MovieCard from "./MovieCard";
 import axios from "axios";
 import { useQuery } from "react-query";
 import "../../styles/video.css";

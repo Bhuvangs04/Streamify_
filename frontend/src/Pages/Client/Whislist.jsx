@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Hls from "hls.js"; // Import the hls.js library
-import { MovieCard } from "./Moviecard2"; // Import the MovieCard component
+import  {MovieCard}  from "./Moviecard2"; // Import the MovieCard component
 import axios from "axios";
 import NavbarPage from "./NavBar";
 
