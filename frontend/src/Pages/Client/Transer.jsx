@@ -16,7 +16,7 @@ function TransferPages() {
   const handleEmailsSubmit = async (currentEmail, newEmail) => {
     try {
       const response = await fetch(
-        "http://localhost:8081/api/user/send-verification",
+        "https://streamify-694k.onrender.com/api/user/send-verification",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -41,7 +41,7 @@ function TransferPages() {
   const handleVerificationComplete = async (currentOtp, newOtp) => {
     try {
       const response = await fetch(
-        "http://localhost:8081/api/user/verify-transfer-otp",
+        "https://streamify-694k.onrender.com/api/user/verify-transfer-otp",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -70,7 +70,7 @@ function TransferPages() {
   const handleTransferComplete = async () => {
     try {
       const response = await fetch(
-        "http://localhost:8081/api/user/update/transfer/user",
+        "https://streamify-694k.onrender.com/api/user/update/transfer/user",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
