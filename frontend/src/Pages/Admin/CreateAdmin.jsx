@@ -48,7 +48,7 @@ function CreateAccountPage() {
 
     try {
       await axios.post(
-        "http://localhost:8081/api/netflix/new/admin-account",
+        "https://streamify-694k.onrender.com/api/netflix/new/admin-account",
         formData,
         {
           withCredentials: true,
