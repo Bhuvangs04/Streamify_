@@ -2,7 +2,7 @@ import { CheckCircle2, Mail, KeyRound, ArrowRight } from "lucide-react";
 import EmailForm from "./EmailForm";
 import OTPVerification from "./OTPVerification";
 import TransferConfirmation from "./TransferConfirmation";
-import { Stamp } from "@/components/ui/stamp";
+import { Stamp } from "@/components/ui/Stamp";
 import { cn } from "@/lib/utils";
 
 const steps = [
