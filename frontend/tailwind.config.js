@@ -1,5 +1,8 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+import tailwindcssAnimate from 'tailwindcss-animate';
+import tailwindScrollbarHide from 'tailwind-scrollbar-hide';
+
+export default {
   darkMode: ["class"],
   content: [
     "./pages/**/*.{js,jsx}",
