@@ -4,7 +4,7 @@ import { ChevronDown, ChevronUp, Heart, Play } from "lucide-react";
 import axios from "axios";
 import { cn } from "@/lib/utils";
 
-export default function MovieCard({ movie, onPlay }) {
+export function MovieCard({ movie, onPlay }) {
   const [showDescription, setShowDescription] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(movie.isInWishlist || false);
   const [isHovered, setIsHovered] = useState(false);
