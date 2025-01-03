@@ -9,7 +9,6 @@ const movieSchema = require("../models/Movies");
 const EmailChangeLog = require("../models/Email");
 const router = express.Router();
 require("dotenv").config();
-const redisClient = require("./config/redis");
 const checkAdmin = require("../middleware/Admin");
 
 router.get(
@@ -38,11 +37,6 @@ router.get(
     try {
       const { paymentId } = req.params;
 
-      const cachedDetails = await redisClient.get(paymentId);
-
-      if (cachedDetails) {
-        return res.status(200).json(JSON.parse(cachedDetails)); // Parse the cached JSON string
-      }
       const refund = await RefundSchema.findOne({
         PaymentId: paymentId,
       }).populate({
@@ -78,7 +72,6 @@ router.get(
         },
       };
 
-      await redisClient.setex(paymentId, 86400, JSON.stringify(refundData));
 
       // Respond with filtered data
       res.status(200).json(refundData);
