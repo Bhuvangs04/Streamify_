@@ -15,7 +15,7 @@ const SettlementsPage = () => {
     queryFn: async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8081/api/payment/payment/settlement`,
+          `https://streamify-694k.onrender.com/api/payment/payment/settlement`,
           { withCredentials: true }
         );
         return response.data.items || [];
