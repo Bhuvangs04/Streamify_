@@ -13,7 +13,7 @@ const RefundStatusModal = ({ isOpen, onClose, paymentId }) => {
     queryKey: ["refundStatus", paymentId],
     queryFn: async () => {
       const response = await axios.get(
-        `http://localhost:8081/api/payment/refund-status/${paymentId}`
+        `https://streamify-694k.onrender.com/api/payment/refund-status/${paymentId}`
       );
       return response.data;
     },
