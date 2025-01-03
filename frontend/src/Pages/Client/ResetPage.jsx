@@ -37,7 +37,7 @@ const ResetPassword = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        `http://localhost:8081/api/user/reset-password/${token}`,
+        `https://streamify-694k.onrender.com/api/user/reset-password/${token}`,
         { password }
       );
       setMessage(response.data.message);
