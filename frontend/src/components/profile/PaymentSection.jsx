@@ -17,7 +17,7 @@ const PaymentSection = ({ watchBy, lastPayment, userId }) => {
     queryFn: async () => {
       const currentDate = new Date().toISOString();
       const response = await fetch(
-        `http://localhost:8081/api/user/payment-details/${userId}/${currentDate}/final`,
+        `https://streamify-694k.onrender.com/api/user/payment-details/${userId}/${currentDate}/final`,
         {
           credentials: "include",
         }
