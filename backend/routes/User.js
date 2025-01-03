@@ -15,7 +15,6 @@ const historySchema = require("../models/History");
 const otpSchema = require("../models/Otp");
 const emailChangeLogSchema = require("../models/Email");
 const { createTokenForDevice } = require("../middleware/Auth");
-const redisClient = require("./config/redis");
 
 router.use((req, res, next) => {
   if (
@@ -566,12 +565,7 @@ router.get(
 
     try {
       // Check Redis cache first
-      const cachedUser = await redisClient.get(userId);
-      if (cachedUser) {
-        return res
-          .status(200)
-          .json({ message: "Success", userDetails: JSON.parse(cachedUser) });
-      }
+    
 
       // Fetch from DB if not in cache
       const explain = await userSchema
@@ -594,7 +588,6 @@ router.get(
       }
 
       // Cache the user details for future requests
-      await redisClient.setex(userId, 60, JSON.stringify(userDetails));
 
       return res.status(200).json({ message: "Success", userDetails });
     } catch (err) {
