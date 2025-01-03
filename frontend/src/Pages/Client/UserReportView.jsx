@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 // Function to fetch all reports
 const fetchReports = async () => {
   const response = await axios.get(
-    `http://localhost:8081/api/admin/reports/user/reports`,
+    `https://streamify-694k.onrender.com/api/admin/reports/user/reports`,
     {
       withCredentials: true,
     }
@@ -34,7 +34,7 @@ const fetchReports = async () => {
 // Function to update report status
 const updateReportStatus = async ({ reportId, status }) => {
   const response = await axios.post(
-    `http://localhost:8081/api/admin/reports/update/report/${reportId}/status`,
+    `https://streamify-694k.onrender.com/api/admin/reports/update/report/${reportId}/status`,
     { status },
     { withCredentials: true }
   );
