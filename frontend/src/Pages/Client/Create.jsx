@@ -97,7 +97,7 @@ function CreateAccountPage() {
   const verifyOtp = async () => {
     try {
       setIsProcessing(true);
-      await axios.post("http://localhost:8081/api/netflix/new/verify-otp", {
+      await axios.post("https://streamify-694k.onrender.com/api/netflix/new/verify-otp", {
         email: formData.email,
         otp,
       });
