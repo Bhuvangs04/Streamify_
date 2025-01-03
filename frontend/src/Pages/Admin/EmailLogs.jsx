@@ -11,7 +11,7 @@ export default function EmailChangeLogsPage() {
     queryKey: ["emailChangeLogs"],
     queryFn: async () => {
       const response = await fetch(
-        "http://localhost:8081/api/admin/user/email/change-logs",
+        "https://streamify-694k.onrender.com/api/admin/user/email/change-logs",
         {
           credentials: "include",
         }
