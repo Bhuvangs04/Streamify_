@@ -13,7 +13,7 @@ export default function MovieCard({ movie, onPlay }) {
 
   const toggleWishlist = async () => {
     try {
-      const url = `http://localhost:8081/api/user/${movie.id}/wishlist`;
+      const url = `https://streamify-694k.onrender.com/api/user/${movie.id}/wishlist`;
       const method = isInWishlist ? "DELETE" : "POST";
 
       await axios({
