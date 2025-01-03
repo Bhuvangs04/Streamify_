@@ -7,7 +7,7 @@ import NavbarPage from "./NavBar";
 import DeviceLimitModal from "./DeviceLimitModal";
 import CustomVideoPlayerPage from "@/components/VideoPlayer/CustomVideoPlayer";
 
-const API_BASE_URL = "http://localhost:8081";
+const API_BASE_URL = "https://streamify-694k.onrender.com";
 const MOVIES_API_URL = `${API_BASE_URL}/api/movies`;
 
 const fetchMovies = async () => {
