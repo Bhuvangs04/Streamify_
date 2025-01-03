@@ -35,7 +35,7 @@ const UserProfile = () => {
       const currentDate = getCurrentDate();
       await new Promise((resolve) => setTimeout(resolve, 3000));
       const response = await axios.get(
-        `http://localhost:8081/api/admin/send/all/detailed/${currentDate}/fetchAll`
+        `https://streamify-694k.onrender.com/api/admin/send/all/detailed/${currentDate}/fetchAll`
       );
       return response.data;
     },
