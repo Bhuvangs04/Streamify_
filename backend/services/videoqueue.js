@@ -4,14 +4,21 @@ const fs = require("fs");
 const crypto = require("crypto");
 const movieSchema = require("../models/Movies");
 const Queue = require("bull");
+require('dotenv').config();
 
 // Initialize Bull queue
 const videoQueue = new Queue("video processing", {
-  redis: { host: "127.0.0.1", port: 6379 },
+  redis: {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    password: process.env.REDISCLI_AUTH,
+    username: process.env.REDIS_USER,
+  },
   settings: {
     stalledInterval: 1000 * 60 * 5, // Check for stalled jobs every 5 minutes
-    lockDuration: 1000 * 60 * 10, // Set lock duration to 10 minutes
+    lockDuration: 1000 * 60 * 10, // Lock duration of 10 minutes
     maxStalledCount: 3, // Retry a stalled job 3 times
+    maxConcurrency: 10, // Limit the number of concurrent jobs to 10
   },
 });
 
