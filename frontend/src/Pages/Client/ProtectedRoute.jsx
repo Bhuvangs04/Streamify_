@@ -8,7 +8,7 @@ axios.defaults.withCredentials = true;
 // Function to verify authentication
 const verifyAuth = async () => {
   const response = await axios.get(
-    "http://localhost:8081/api/netflix/verify-auth",
+    "https://streamify-694k.onrender.com/api/netflix/verify-auth",
     {
       withCredentials: true,
     }
