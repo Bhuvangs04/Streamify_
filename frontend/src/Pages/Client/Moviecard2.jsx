@@ -14,7 +14,7 @@ export function MovieCardMain2({ movie, onPlay, onRemove }) {
       setRemoving(true);
       // Call the backend to delete the movie from the wishlist
       await axios.delete(
-        `http://localhost:8081/api/user/${movie.id}/wishlist`,
+        `https://streamify-694k.onrender.com/api/user/${movie.id}/wishlist`,
         { withCredentials: true } // Include credentials for authentication
       );
       // Notify parent component to remove the movie
