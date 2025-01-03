@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 
 const fetchUserRole = async () => {
-  const response = await axios.get("http://localhost:8081/api/user/getRole", {
+  const response = await axios.get("https://streamify-694k.onrender.com/api/user/getRole", {
     withCredentials: true,
   });
   return response.data;
@@ -64,7 +64,7 @@ export default function NavbarPage() {
       const token = localStorage.getItem("authToken");
       if (token) {
         await axios.post(
-          "http://localhost:8081/api/user/stop-streaming",
+          "https://streamify-694k.onrender.com/api/user/stop-streaming",
           {},
           {
             headers: {
@@ -76,7 +76,7 @@ export default function NavbarPage() {
       }
 
       await axios.post(
-        "http://localhost:8081/api/user/logout",
+        "https://streamify-694k.onrender.com/api/user/logout",
         {},
         {
           withCredentials: true,
