@@ -295,13 +295,15 @@ router.post(
       });
       const activeUsers = totalUsers - blockedUsers;
       const paidUsers = await paymentSchema.aggregate([
-        {
-          $group: {
-            _id: "$userId",
-            totalPaid: { $sum: { $toDouble: "$Paid" } },
-          },
-        },
-      ]);
+      {
+    $group: {
+      _id: "$userId",
+      totalPaid: { $sum: { $toDouble: "$Paid" } },
+      Refunded: { $first: false }
+     },
+      },
+    ]);
+
       const totalRevenue = paidUsers.reduce(
         (acc, user) => acc + user.totalPaid,
         0
