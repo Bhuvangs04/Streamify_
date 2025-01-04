@@ -204,7 +204,7 @@ export function Main() {
 
       {selectedMovie && (
         <CustomVideoPlayerPage
-          src={`{
+          src={`${
             selectedMovie.resolutions.find(
               (res) => res.quality === currentQuality
             )?.url
