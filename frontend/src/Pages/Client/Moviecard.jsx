@@ -39,7 +39,7 @@ export default function MovieCard({ movie, onPlay }) {
     >
       {/* Movie Poster */}
       <img
-        src={`http://localhost:8081${movie.poster}`}
+        src={`${movie.poster}`}
         alt={movie.title}
         className="w-full h-[320px] object-cover rounded-lg"
         loading="lazy"
