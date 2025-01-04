@@ -184,7 +184,7 @@ export function HistoryPage() {
 
       {selectedMovie && (
         <CustomVideoPlayerPage
-          src={`${API_BASE_URL}${
+          src={`${
             selectedMovie.resolutions.find(
               (res) => res.quality === currentQuality
             )?.url
