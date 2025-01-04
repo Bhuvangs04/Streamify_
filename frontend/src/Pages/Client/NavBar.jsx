@@ -62,7 +62,7 @@ export default function NavbarPage() {
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem("authToken");
-      if (token) {
+      if (token && !isAdmin) {
         await axios.post(
           "https://streamify-694k.onrender.com/api/user/stop-streaming",
           {},
