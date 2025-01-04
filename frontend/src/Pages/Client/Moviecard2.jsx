@@ -30,7 +30,7 @@ export function MovieCardMain2({ movie, onPlay, onRemove }) {
     <div className="ml-2 w-80 bg-gray-800 text-white rounded-lg shadow-lg overflow-hidden">
       <div className="relative">
         <img
-          src={`http://localhost:8081${movie.poster}`}
+          src={`${movie.poster}`}
           alt={movie.title}
           className="w-full h-48 object-cover"
           loading="lazy"
