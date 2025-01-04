@@ -71,7 +71,7 @@ function CreateAccountPage() {
     try {
       setIsProcessing(true);
       await axios.post(
-        "http://localhost:8081/api/netflix/new/send-verification",
+        "https://streamify-694k.onrender.com/api/netflix/new/send-verification",
         {
           email: formData.email,
         }
@@ -114,7 +114,7 @@ function CreateAccountPage() {
   const handleFinalSubmit = async () => {
     try {
       await axios.post(
-        "http://localhost:8081/api/netflix/new/account",
+        "https://streamify-694k.onrender.com/api/netflix/new/account",
         formData
       );
       navigate("/login");
