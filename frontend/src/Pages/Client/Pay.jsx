@@ -94,7 +94,6 @@ useEffect(() => {
       }
 
       const keyID = import.meta.env.VITE_APP_RAZORPAY_KEY_ID;
-      console.log(keyID);
       const options = {
         key: keyID,
         amount: plan.price * 100,
@@ -150,7 +149,6 @@ useEffect(() => {
       });
       rzp.open();
     } catch (error) {
-      console.log(error);
       setError("Payment initiation failed.");
       setTimeout(() => {
         setError(null);
