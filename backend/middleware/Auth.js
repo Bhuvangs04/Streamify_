@@ -7,7 +7,7 @@ async function createTokenForUser(user) {
     username: user.username,
     role: user.role,
   };
-  const token = JWT.sign(payload, Secret, { expiresIn: "1d" });
+  const token = JWT.sign(payload, Secret, { expiresIn: "20hr" });
   return token;
 }
 
@@ -20,7 +20,7 @@ function createTokenForDevice(device) {
     platform: device.deviceDetails.platform,
     isActive: device.isActive,
   };
-  const token = JWT.sign(payload, Secret, { expiresIn: "12hr" });
+  const token = JWT.sign(payload, Secret, { expiresIn: "1d" });
   return token;
 }
 
