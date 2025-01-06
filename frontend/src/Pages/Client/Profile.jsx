@@ -210,6 +210,37 @@ export default function ProfilePage() {
     }
   };
 
+    if (loadingDevices)
+  {
+     return (
+       <div className="flex items-center justify-center min-h-screen">
+         <div
+           className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"
+           aria-hidden="true"
+         ></div>
+       </div>
+     );
+  }
+
+  if (loadingUserRole)
+  {
+<div className="flex items-center justify-center min-h-screen">
+  <div
+    className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"
+    aria-hidden="true"
+  ></div>
+</div>;
+  }
+
+  if (loadingProfile)
+  {<div className="flex items-center justify-center min-h-screen">
+    <div
+      className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"
+      aria-hidden="true"
+    ></div>
+  </div>;
+}
+
   return (
     <div className="min-h-screen bg-custom-dark-bg">
       <SidebarProvider>
