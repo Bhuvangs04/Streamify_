@@ -206,7 +206,6 @@ router.post("/order", verifyToken, async (req, res) => {
     await paymentHistory.save();
     return res.json({ order });
   } catch (error) {
-    console.log(error);
     res.status(500).send({ message: "Internal Server Error" });
   }
 });
@@ -442,8 +441,7 @@ router.get(
       );
       res.json(response.data);
     } catch (error) {
-      console.log(error)
-      res.status(500).send("Internal Server Error");
+      res.status(500).send({message:"Internal Server Error"});
     }
   }
 );
@@ -583,7 +581,7 @@ router.post(
     } catch (error) {
       res.status(500).json({
         message: "An error occurred while processing the refund.",
-        error: error.message || error, // Provide more details if available
+        error: error.message || error,
       });
     }
   }
