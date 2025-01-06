@@ -206,6 +206,7 @@ router.post("/order", verifyToken, async (req, res) => {
     await paymentHistory.save();
     return res.json({ order });
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: "Internal Server Error" });
   }
 });
@@ -441,6 +442,7 @@ router.get(
       );
       res.json(response.data);
     } catch (error) {
+      console.log(error)
       res.status(500).send("Internal Server Error");
     }
   }
