@@ -50,16 +50,21 @@ const PaymentPage = () => {
     retry: 2,
   });
 
-  useEffect(() => {
+useEffect(() => {
+  const scriptId = "razorpay-checkout-script";
+
+  // Check if the script is already loaded
+  if (!document.getElementById(scriptId)) {
     const script = document.createElement("script");
+    script.id = scriptId;
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
-    script.onload = () => document.body.appendChild(script);
+    document.body.appendChild(script);
+  }
 
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+  // No need to remove the script on cleanup
+}, []);
+
 
   const handlePayment = async (plan) => {
     try {
