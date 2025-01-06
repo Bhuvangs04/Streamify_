@@ -357,7 +357,6 @@ router.post(
 router.get("/movies", verifyToken, async (req, res) => {
   try {
     const movies = await movieSchema.find({ publish: "true" });
-    console.log(movies);
     res.status(200).json({ success: true, movies });
   } catch (err) {
     res.status(500).send("Error fetching movies.");
