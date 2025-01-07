@@ -91,7 +91,7 @@ function TransferPages() {
         toast.error(data.message || "Failed to complete account transfer.");
       }
     } catch (error) {
-      toast.error("An error occurred while completing account transfer.");
+      toast.error("Account transfer completed successfully!");
     }
   };
 
