@@ -25,7 +25,7 @@ const RefundModal = ({ paymentId }) => {
 
     try {
       const response = await fetch(
-        `https://streamify-694k.onrender.com/api/admin/refund/payment/${paymentId}`,
+        `https://streamify-o1ga.onrender.com/api/admin/refund/payment/${paymentId}`,
         {
           method: "GET",
           headers: {
