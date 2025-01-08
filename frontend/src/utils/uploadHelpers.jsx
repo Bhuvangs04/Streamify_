@@ -18,7 +18,7 @@ export const uploadMovieChunk = async (
   chunkFormData.append("movieId", movieId);
   chunkFormData.append("title", title);
 
-  await axios.post("https://streamify-694k.onrender.com/api/upload-chunk", chunkFormData, {
+  await axios.post("https://streamify-o1ga.onrender.com/api/upload-chunk", chunkFormData, {
     headers: { "Content-Type": "multipart/form-data" },
     withCredentials: true,
   });
@@ -26,7 +26,7 @@ export const uploadMovieChunk = async (
 
 export const uploadPosterAndMetadata = async (formData) => {
   const response = await axios.post(
-    "http://localhost:8081/api/upload-metadata",
+    "https://streamify-o1ga.onrender.com/api/upload-metadata",
     formData,
     {
       headers: { "Content-Type": "multipart/form-data" },
