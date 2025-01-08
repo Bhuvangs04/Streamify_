@@ -46,7 +46,7 @@ app.use(cookieParser());
 
 // CORS Configuration
 const corsOptions = {
-  origin: ["https://streamify-694k.onrender.com"],
+  origin: ["https://streamify-o1ga.onrender.com"],
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: ["Content-Type", "Authorization"],
