@@ -26,8 +26,8 @@ const PlanForm = ({ plan, onClose, onSuccess }) => {
     e.preventDefault();
     try {
       const url = plan
-        ? `https://streamify-694k.onrender.com/api/payment/update/plan/current/${plan.id}`
-        : "https://streamify-694k.onrender.com/api/payment/plans/new";
+        ? `https://streamify-o1ga.onrender.com/api/payment/update/plan/current/${plan.id}`
+        : "https://streamify-o1ga.onrender.com/api/payment/plans/new";
       const response = await fetch(url, {
         method: plan ? "PATCH" : "POST",
         headers: {
