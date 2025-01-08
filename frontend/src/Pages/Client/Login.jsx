@@ -17,7 +17,7 @@ export default function LoginPage() {
     setErrorMessage("");
     try {
       const response = await axios.post(
-        "https://streamify-694k.onrender.com/api/netflix/login",
+        "https://streamify-o1ga.onrender.com/api/netflix/login",
         {
           email,
           password,
@@ -25,7 +25,6 @@ export default function LoginPage() {
       );
 
       if (response.data.message === "Login successful") {
-        // If login is successful
         if (response.data.role === "user") {
           const deviceDetails = {
             userAgent: navigator.userAgent,
@@ -54,7 +53,7 @@ export default function LoginPage() {
 
           // Send device details to backend to start streaming
           const streamingResponse = await axios.post(
-            "https://streamify-694k.onrender.com/api/user/start-streaming",
+            "https://streamify-o1ga.onrender.com/api/user/start-streaming",
             { deviceDetails },
             { withCredentials: true }
           );
@@ -81,7 +80,7 @@ export default function LoginPage() {
           navigate("/users/statics");
         } else {
           const paymentResponse = await axios.get(
-            "https://streamify-694k.onrender.com/api/payment/check-payment",
+            "https://streamify-o1ga.onrender.com/api/payment/check-payment",
             { withCredentials: true }
           );
 
