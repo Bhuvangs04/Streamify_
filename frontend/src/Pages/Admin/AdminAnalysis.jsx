@@ -34,7 +34,7 @@ const AdminAnalytics = () => {
     queryKey: ["analytics"],
     queryFn: async () => {
       const response = await axios.post(
-        "https://streamify-694k.onrender.com/api/admin/analytics/details",
+        "https://streamify-o1ga.onrender.com/api/admin/analytics/details",
         {
           withCredentials: true,
         }
