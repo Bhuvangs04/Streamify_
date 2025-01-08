@@ -20,14 +20,14 @@ import UserDetailsModal from "./UserModal";
 // API calls
 const fetchReports = async () => {
   const response = await axios.get(
-    "https://streamify-694k.onrender.com/api/admin/reports/reports"
+    "https://streamify-o1ga.onrender.com/api/admin/reports/reports"
   );
   return response.data.reports;
 };
 
 const fetchReport = async (reportId) => {
   const response = await axios.get(
-    `https://streamify-694k.onrender.com/api/admin/reports/report/${reportId}`,
+    `https://streamify-o1ga.onrender.com/api/admin/reports/report/${reportId}`,
     {
       withCredentials: true,
     }
@@ -37,7 +37,7 @@ const fetchReport = async (reportId) => {
 
 const submitResponse = async ({ reportId, response }) => {
   const result = await axios.post(
-    `https://streamify-694k.onrender.com/api/admin/reports/report/${reportId}/comment`,
+    `https://streamify-o1ga.onrender.com/api/admin/reports/report/${reportId}/comment`,
     { comment: response },
     { withCredentials: true }
   );
