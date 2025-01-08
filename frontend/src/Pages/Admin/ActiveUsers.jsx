@@ -25,7 +25,7 @@ const fetchActiveUsers = async () => {
   await new Promise((resolve) => setTimeout(resolve, 3000));
 
   const response = await axios.get(
-    "https://streamify-694k.onrender.com/api/admin/activeUsers"
+    "https://streamify-o1ga.onrender.com/api/admin/activeUsers"
   );
   return response.data; // Expecting { activeUsers: [], paymentDetails: [] }
 };
@@ -53,7 +53,7 @@ const PaymentManagement = () => {
     setProcessingUserId(userId);
     try {
       await axios.post(
-        `https://streamify-694k.onrender.com/api/admin/send/inactive/${userId}`
+        `https://streamify-o1ga.onrender.com/api/admin/send/inactive/${userId}`
       );
       setAlert({
         type: "success",
@@ -70,7 +70,7 @@ const PaymentManagement = () => {
     setProcessingUserId(userId);
     try {
       const response = await axios.post(
-        `https://streamify-694k.onrender.com/api/admin/send/${block}/${userId}`
+        `https://streamify-o1ga.onrender.com/api/admin/send/${block}/${userId}`
       );
 
       setAlert({
