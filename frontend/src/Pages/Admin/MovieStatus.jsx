@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 
 const fetchMovies = async () => {
   const response = await axios.post(
-    "https://streamify-694k.onrender.com/api/admin/movie/uploaded/details"
+    "https://streamify-o1ga.onrender.com/api/admin/movie/uploaded/details"
   );
   if (response.status === 200) {
     return response.data.MovieDetails;
@@ -41,7 +41,7 @@ const AdminMovieStatus = () => {
 
       // Axios API call to toggle publish status
       const response = await axios.post(
-        `https://streamify-694k.onrender.com/api/publish/${toggledStatus}/${movieId}/final`,
+        `https://streamify-o1ga.onrender.com/api/publish/${toggledStatus}/${movieId}/final`,
         {},
         {
           headers: {
