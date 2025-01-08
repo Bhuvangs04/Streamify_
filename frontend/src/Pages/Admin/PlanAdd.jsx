@@ -21,7 +21,7 @@ import PlanActions from "./PlanActions";
 // Fetch plans from API
 const fetchPlans = async () => {
   const response = await fetch(
-    "https://streamify-694k.onrender.com/api/payment/admin/plans",
+    "https://streamify-o1ga.onrender.com/api/payment/admin/plans",
     {
       credentials: "include",
     }
@@ -39,7 +39,7 @@ const fetchPlans = async () => {
 // Delete a plan
 const deletePlan = async (planId) => {
   const response = await fetch(
-    `https://streamify-694k.onrender.com/api/payment/delete/plan/${planId}`,
+    `https://streamify-o1ga.onrender.com/api/payment/delete/plan/${planId}`,
     {
       method: "DELETE",
       credentials: "include",
@@ -58,7 +58,7 @@ const togglePlanStatus = async ({ planId, status }) => {
   }
 
   const response = await fetch(
-    `https://streamify-694k.onrender.com/api/payment/plans/${planId}/${status}`,
+    `https://streamify-o1ga.onrender.com/api/payment/plans/${planId}/${status}`,
     {
       method: "POST",
       headers: {
