@@ -37,7 +37,7 @@ const UserDetailsModal = ({ isOpen, onClose, userDetails }) => {
     setIsSending(true);
     try {
       await axios.post(
-        `https://streamify-694k.onrender.com/api/admin/reports/send-email/${userDetails._id}`,
+        `https://streamify-o1ga.onrender.com/api/admin/reports/send-email/${userDetails._id}`,
         {
           content: emailContent,
         },
