@@ -21,7 +21,7 @@ export default function WishlistPage() {
       try {
         setLoading(true);
         const response = await axios.get(
-          "https://streamify-694k.onrender.com/api/user/get-movies-wishlist",
+          "https://streamify-o1ga.onrender.com/api/user/get-movies-wishlist",
           { withCredentials: true }
         );
 
@@ -75,7 +75,7 @@ export default function WishlistPage() {
   const handleRemoveFromWishlist = async (movieId) => {
     try {
       setRemovingMovies((prev) => [...prev, movieId]); // Track the movie being removed
-      await axios.delete(`https://streamify-694k.onrender.com/api/user/${movieId}/wishlist`, {
+      await axios.delete(`https://streamify-o1ga.onrender.com/api/user/${movieId}/wishlist`, {
         withCredentials: true,
       });
 
