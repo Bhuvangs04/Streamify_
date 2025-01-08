@@ -71,7 +71,7 @@ function CreateAccountPage() {
     try {
       setIsProcessing(true);
       await axios.post(
-        "https://streamify-694k.onrender.com/api/netflix/new/send-verification",
+        "https://streamify-o1ga.onrender.com/api/netflix/new/send-verification",
         {
           email: formData.email,
         }
@@ -97,7 +97,7 @@ function CreateAccountPage() {
   const verifyOtp = async () => {
     try {
       setIsProcessing(true);
-      await axios.post("https://streamify-694k.onrender.com/api/netflix/new/verify-otp", {
+      await axios.post("https://streamify-o1ga.onrender.com/api/netflix/new/verify-otp", {
         email: formData.email,
         otp,
       });
@@ -114,7 +114,7 @@ function CreateAccountPage() {
   const handleFinalSubmit = async () => {
     try {
       await axios.post(
-        "https://streamify-694k.onrender.com/api/netflix/new/account",
+        "https://streamify-o1ga.onrender.com/api/netflix/new/account",
         formData
       );
       navigate("/login");
