@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 const fetchReports = async () => {
   const response = await axios.get(
-    "https://streamify-694k.onrender.com/api/admin/reports/user/reports",
+    "https://streamify-o1ga.onrender.com/api/admin/reports/user/reports",
     {
       withCredentials: true,
     }
