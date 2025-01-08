@@ -29,7 +29,7 @@ const SearchPage = () => {
       if (!searchTerm.trim()) return [];
       try {
         const response = await axios.get(
-          `https://streamify-694k.onrender.com/api/admin/payment-details/search`,
+          `https://streamify-o1ga.onrender.com/api/admin/payment-details/search`,
           {
             params: { term: searchTerm },
             withCredentials: true,
@@ -82,7 +82,7 @@ const SearchPage = () => {
     try {
       const amount = selectedPayment.amount; // Full refund (amount in paise)
       const response = await axios.post(
-        `https://streamify-694k.onrender.com/api/payment/refund/${paymentId}`,
+        `https://streamify-o1ga.onrender.com/api/payment/refund/${paymentId}`,
         { amount }
       );
       toast.success(`Refund successfully initiated for ${paymentId}`);
@@ -94,7 +94,7 @@ const SearchPage = () => {
   const fetchPaymentDetails = async (paymentId) => {
     try {
       const response = await axios.get(
-        `https://streamify-694k.onrender.com/api/payment/payment-details/${paymentId}`,
+        `https://streamify-o1ga.onrender.com/api/payment/payment-details/${paymentId}`,
         { withCredentials: true }
       );
       setSelectedPayment(response.data.paymentDetails);
