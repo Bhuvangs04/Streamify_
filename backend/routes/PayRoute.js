@@ -166,7 +166,6 @@ router.get("/plans", verifyToken, checkAccountLock, async (req, res) => {
   }
 });
 
-// Create Razorpay order
 router.post("/order", verifyToken, checkAccountLock, async (req, res) => {
   const userId = req.user.userId;
 
@@ -182,89 +181,77 @@ router.post("/order", verifyToken, checkAccountLock, async (req, res) => {
     const { options, deviceDetails, UserCode } = req.body;
 
     const dataString = JSON.stringify(deviceDetails);
-    const recalculatedHash = CryptoJS.HmacSHA256(
-      dataString,
-      SECRET_KEY
-    ).toString(CryptoJS.enc.Base64);
+    const recalculatedHash = CryptoJS.HmacSHA256(dataString, SECRET_KEY).toString(CryptoJS.enc.Base64);
 
-      if (UserCode !== recalculatedHash) {
-      return res.status(403).json({ message: "Data has Tampered." });
+    if (UserCode !== recalculatedHash) {
+      return res.status(403).json({ message: "Data has been tampered." });
     }
-      if (
-        !options ||
-        !options.amount ||
-        !options.currency ||
-        !options.receipt
-      ) {
-        return res.status(400).send({ message: "Invalid payment options." });
+
+    if (!options || !options.amount || !options.currency || !options.receipt) {
+      return res.status(400).send({ message: "Invalid payment options." });
+    }
+
+    if (options.receipt) {
+      const checkReceipt = await PlanSchema.findOne({ id: options.receipt });
+      if (!checkReceipt) {
+        return res.status(404).send({ message: "Receipt not found." });
       }
 
-      if (options.receipt) {
-        const checkReceipt = await PlanSchema.findOne({
-          id: options.receipt,
+      if (checkReceipt.status === false) {
+        return res.status(400).send({ message: "This plan no longer exists" });
+      }
+
+      if (checkReceipt.price * 100 !== options.amount) {
+        const suspiciousOrder = new suspiciousOrderSchema({
+          userId: req.user.userId,
+          orderId: options.receipt,
+          amount: options.amount / 100,
+          currency: options.currency,
+          tamperingType: "Amount tampering",
+          status: "Pending",
+          isSuspicious: true,
+          additionalInfo: `Amount tampered: expected ${checkReceipt.price * 100} but received ${options.amount}`,
         });
 
-        if (checkReceipt) {
-          if (checkReceipt.status === false) {
-            return res
-              .status(400)
-              .send({ message: "This plan no longer exists" });
-          }
-
-          if (checkReceipt.price * 100 !== options.amount) {
-            const suspiciousOrder = new SuspiciousOrder({
-              userId: user._id,
-              orderId: options.receipt,
-              amount: options.amount / 100,
-              currency: options.currency,
-              tamperingType: "Amount tampering",
-              status:"Pending",
-              isSuspicious: true,
-              additionalInfo: `Amount tampered: expected ${
-                checkReceipt.price * 100
-              } but received ${options.amount}`,
-            });
-            await suspiciousOrder.save();
-
-            return res.status(403).send({ message: "Data has been tampered" });
-          }
-        } else {
-          return res.status(404).send({ message: "Receipt not found" });
-        }
+        await suspiciousOrder.save(); // Log suspicious order
+        return res.status(403).send({ message: "Data has been tampered" });
       }
+    }
 
-      const order = await razorpay.orders.create(options);
+    const order = await razorpay.orders.create(options);
 
-      if (!order) {
-        return res.status(500).send({ message: "Failed to create order." });
-      }
+    if (!order) {
+      return res.status(500).send({ message: "Failed to create order." });
+    }
 
-      const newAmount = options.amount / 100;
+    const newAmount = options.amount / 100;
 
-      // Log the order details into payment history
-      const paymentHistory = new payHistorySchema({
-        userId,
-        orderId: order.id,
-        amount: newAmount,
-        currency: options.currency,
-        status: "pending",
-        createdAt: new Date(),
-        ipAddress: deviceDetails.ip,
-        city: deviceDetails.city,
-        country: deviceDetails.country,
-        network: deviceDetails.network,
-        version: deviceDetails.version,
-        latitude: deviceDetails.latitude,
-        longitude: deviceDetails.longitude,
-      });
+    const paymentHistory = new payHistorySchema({
+      userId,
+      orderId: order.id,
+      amount: newAmount,
+      currency: options.currency,
+      status: "pending",
+      createdAt: new Date(),
+      ipAddress: deviceDetails.ip,
+      city: deviceDetails.city,
+      country: deviceDetails.country,
+      network: deviceDetails.network,
+      version: deviceDetails.version,
+      latitude: deviceDetails.latitude,
+      longitude: deviceDetails.longitude,
+    });
 
-      await paymentHistory.save();
-       res.json({ order });
+    await paymentHistory.save(); // Log payment history
+
+    return res.json({ order });
   } catch (error) {
     console.log(error);
     res.status(500).send({ message: "Internal Server Error" });
   }
 });
+
+// Create Razorpay order
 
 // Validate payment
 router.post("/order/validate", verifyToken, checkAccountLock,async (req, res) => {
@@ -385,7 +372,7 @@ router.post("/order/validate", verifyToken, checkAccountLock,async (req, res) =>
       html: message,
     });
 
-    await payHistorySchema.findOneAndUpdate(
+  await payHistorySchema.findOneAndUpdate(
       { orderId: razorpay_order_id },
       {
         $set: {
@@ -402,6 +389,7 @@ router.post("/order/validate", verifyToken, checkAccountLock,async (req, res) =>
         },
       }
     );
+
     const payment = await paymentSchema.findOne({ userId: userId });
     const updateData = {
       PlanName,
@@ -418,6 +406,7 @@ router.post("/order/validate", verifyToken, checkAccountLock,async (req, res) =>
       latitude: deviceDetails.latitude,
       longitude: deviceDetails.longitude,
     };
+    
     if (payment && payment.Refunded) {
       if (payment.Refunded === true) {
         updateData.Refunded = false;
@@ -430,6 +419,7 @@ router.post("/order/validate", verifyToken, checkAccountLock,async (req, res) =>
       { new: true, upsert: true }
     );
 
+    // Update user last payment date and unblock status
     await userSchema.findByIdAndUpdate(userId, {
       lastPaymentDate: new Date(),
       userBlocked: "unBlocked",
@@ -441,6 +431,7 @@ router.post("/order/validate", verifyToken, checkAccountLock,async (req, res) =>
       paymentId: razorpay_payment_id,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: "Internal Server Error" });
   }
 });
