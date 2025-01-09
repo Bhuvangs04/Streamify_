@@ -11,6 +11,7 @@ import {
 import { useQuery } from "react-query";
 import {X} from "lucide-react";
 import {useNavigate} from "react-router-dom"
+import { toast } from "sonner";
 
 
 const fetchSuspiciousActivities = async (page, limit) => {
