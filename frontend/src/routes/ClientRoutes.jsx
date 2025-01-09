@@ -16,6 +16,7 @@ export const PATHS = {
   NOT_FOUND: "*",
   HISTORY_PAGE: "/history",
   TRANSFER_PAGE: "/transfer",
+  SUSPEND_PAGE:"/suspend"
 };
 
 // Import pages
@@ -33,36 +34,38 @@ import NotFound from "../Pages/Client/NotfoundPage";
 import ReportsList from "../Pages/Client/ReportListPage";
 import UserReportViewPage from "../Pages/Client/UserReportView";
 import ReportSubmissionPage from "../Pages/Client/ReportSubmission";
+import SuspendPage from "@/Pages/Client/SuspendPage";
 import { HistoryPage } from "@/Pages/Client/History";
 import TransferPages from "@/Pages/Client/Transer";
 
 // Client routes array
 const ClientRoutes = [
   // Public routes
-  { path: PATHS.LOGIN, element: <LoginPage />, isProtected: false },
-  { path: PATHS.FORGET, element: <Forget />, isProtected: false },
+  { path: PATHS.LOGIN, element: <LoginPage /> },
+  { path: PATHS.FORGET, element: <Forget /> },
   {
     path: PATHS.RESET_PASSWORD,
     element: <ResetPassword />,
     isProtected: false,
   },
-  { path: PATHS.SIGNUP, element: <CreateAccountPage />, isProtected: false },
+  { path: PATHS.SIGNUP, element: <CreateAccountPage /> },
   {
     path: PATHS.UNAUTHORIZED,
     element: <UnauthorizedPage />,
-    isProtected: false,
   },
   {
     path: PATHS.HISTORY_PAGE,
     element: <HistoryPage />,
-    isProtected: true,
   },
-
+  {
+    path: PATHS.SUSPEND_PAGE,
+    element: <SuspendPage />,
+  },
   // Protected routes
-  { path: PATHS.HOME, element: <Main />, isProtected: true },
-  { path: PATHS.PROFILE, element: <ProfilePage />, isProtected: true },
-  { path: PATHS.WISHLIST, element: <WishlistPage />, isProtected: true },
-  { path: PATHS.PAY, element: <Payment />, isProtected: true },
+  { path: PATHS.HOME, element: <Main /> },
+  { path: PATHS.PROFILE, element: <ProfilePage /> },
+  { path: PATHS.WISHLIST, element: <WishlistPage /> },
+  { path: PATHS.PAY, element: <Payment /> },
   {
     path: PATHS.PAYMENT_REMINDER,
     element: <PaymentReminder />,
@@ -73,7 +76,7 @@ const ClientRoutes = [
     element: <TransferPages />,
     isProtected: true,
   },
-  { path: PATHS.REPORT_LIST, element: <ReportsList />, isProtected: true },
+  { path: PATHS.REPORT_LIST, element: <ReportsList /> },
   {
     path: PATHS.REPORT_VIEW,
     element: <UserReportViewPage />,
@@ -86,7 +89,7 @@ const ClientRoutes = [
   },
 
   // Catch-all route
-  { path: PATHS.NOT_FOUND, element: <NotFound />, isProtected: true },
+  { path: PATHS.NOT_FOUND, element: <NotFound /> },
 ];
 
 export default ClientRoutes;
