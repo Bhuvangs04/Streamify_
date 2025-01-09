@@ -21,6 +21,7 @@ import UpdatePasswordSection from "@/components/profile/UpdatePasswordSection";
 import PaymentSection from "@/components/profile/PaymentSection";
 import OnlineDevicesSection from "@/components/profile/OnlineDevicesSection";
 import { useQuery } from "react-query";
+import { useNavigate } from "react-router-dom";
 
 const fetchActiveDevices = async () => {
   const response = await axios.get(
@@ -54,23 +55,43 @@ export default function ProfilePage() {
     specialChar: false,
   });
 
+  const navigate = useNavigate();
+
   const {
     data: activeDevicesData,
     isLoading: loadingDevices,
     error: devicesError,
-  } = useQuery("activeDevices", fetchActiveDevices);
+  } = useQuery("activeDevices", fetchActiveDevices, {
+    onError: (error) => {
+      if (error.response?.status === 403) {
+        navigate("/suspend");
+      }
+    },
+  });
 
   const {
     data: userRoleData,
     isLoading: loadingUserRole,
     error: userRoleError,
-  } = useQuery("userRole", fetchUserRole);
+  } = useQuery("userRole", fetchUserRole, {
+    onError: (error) => {
+      if (error.response?.status === 403) {
+        navigate("/suspend");
+      }
+    },
+  });
 
   const {
     data: profileData,
     isLoading: loadingProfile,
     error: profileError,
-  } = useQuery("userProfile", fetchUserProfile);
+  } = useQuery("userProfile", fetchUserProfile, {
+    onError: (error) => {
+      if (error.response?.status === 403) {
+        navigate("/suspend");
+      }
+    },
+  });
 
 
   const onlineDevices = activeDevicesData?.activeDevices || [];
@@ -210,37 +231,37 @@ export default function ProfilePage() {
     }
   };
 
-    if (loadingDevices)
-  {
-     return (
-       <div className="flex items-center justify-center min-h-screen">
-         <div
-           className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"
-           aria-hidden="true"
-         ></div>
-       </div>
-     );
+  if (loadingDevices) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div
+          className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"
+          aria-hidden="true"
+        ></div>
+      </div>
+    );
   }
 
-  if (loadingUserRole)
-  {
-<div className="flex items-center justify-center min-h-screen">
-  <div
-    className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"
-    aria-hidden="true"
-  ></div>
-</div>;
+  if (loadingUserRole) {
+    <div className="flex items-center justify-center min-h-screen">
+      <div
+        className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"
+        aria-hidden="true"
+      ></div>
+    </div>;
   }
 
-  if (loadingProfile)
-  {<div className="flex items-center justify-center min-h-screen">
-    <div
-      className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"
-      aria-hidden="true"
-    ></div>
-  </div>;
-}
 
+
+
+  if (loadingProfile) {
+    <div className="flex items-center justify-center min-h-screen">
+      <div
+        className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"
+        aria-hidden="true"
+      ></div>
+    </div>;
+  }
   return (
     <div className="min-h-screen bg-custom-dark-bg">
       <SidebarProvider>
