@@ -29,24 +29,25 @@ async function verifyToken(req, res, next) {
   }
 }
 
-const checkAccountLock = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user.userId);
-    if (user.role === "admin") {
+async function checkAccountLock(req, res, next) {
+    try {
+      const user = await User.findById(req.user.userId);
+      if (user && user.role === "admin") {
+      return next();
+      }
+      if (user && user.AccountLocked) {
+        return res.status(403).json({
+          message:
+            "Your account has been locked due to suspicious activity. Please contact support.",
+          status: "true",
+        });
+      }
       next();
+    } catch (error) {
+      console.error(error); // Logging the error for debugging
+      res.status(500).json({ message: "Server error." });
     }
-    if (user && user.AccountLocked) {
-      return res.status(403).json({
-        message:
-          "Your account has been locked due to suspicious activity. Please contact support.",
-          status:"true"
-      });
-    }
-    next();
-  } catch (error) {
-    res.status(500).json({ message: "Server error." });
-  }
-};
+  };
 
 
 function decodeDeviceToken(req, res, next) {
