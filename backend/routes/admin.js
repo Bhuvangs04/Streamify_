@@ -77,7 +77,7 @@ router.post(
       if (!user) {
         return res.status(403).send({ message: "No User Found" });
       }
-      const details = await AmountTamp.findById({ userId: userId });
+      const details = await AmountTamp.findOne({ userId: userId });
 
       user.AccountLocked = status;
       await user.save();
