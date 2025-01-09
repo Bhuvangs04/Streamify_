@@ -5,11 +5,12 @@ const checkAdmin = require("../middleware/Admin");
 const userSchema = require("../models/User");
 const nodemailer = require("nodemailer");
 const router = express.Router();
+const { checkAccountLock } = require("../middleware/verify");
 require("dotenv").config();
 
 
 // Route for users to submit a report
-router.post("/report", verifyToken, async (req, res) => {
+router.post("/report", verifyToken, checkAccountLock, async (req, res) => {
   try {
     const { title, description, category } = req.body;
 
@@ -39,51 +40,57 @@ router.post("/report", verifyToken, async (req, res) => {
 });
 
 // Route for admins to respond to a report
-router.post("/report/:reportId/comment", verifyAdmin, async (req, res) => {
-  try {
-    const { reportId } = req.params;
-    const { comment } = req.body;
+router.post(
+  "/report/:reportId/comment",
+  verifyAdmin,
+  checkAccountLock,
+  async (req, res) => {
+    try {
+      const { reportId } = req.params;
+      const { comment } = req.body;
 
-    // Check if the comment is provided
-    if (!comment) {
-      return res.status(400).json({ message: "Comment is required" });
+      // Check if the comment is provided
+      if (!comment) {
+        return res.status(400).json({ message: "Comment is required" });
+      }
+
+      // Find the report by its ID
+      const report = await reportSchema.findById({ _id: reportId });
+
+      if (!report) {
+        return res.status(404).json({ message: "Report not found" });
+      }
+
+      // Check if the user is an admin (you can customize this based on your authentication system)
+      if (req.user.role !== "admin") {
+        return res
+          .status(403)
+          .json({ message: "Only admins can comment on reports" });
+      }
+
+      // Add the comment to the report
+      report.comments.push({
+        user: req.user.userId, // Assuming the admin is authenticated and their ID is in req.user
+        comment,
+      });
+
+      await report.save();
+
+      return res.status(200).json({
+        message: "Comment added successfully",
+        report,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Server error" });
     }
-
-    // Find the report by its ID
-    const report = await reportSchema.findById({ _id: reportId });
-
-    if (!report) {
-      return res.status(404).json({ message: "Report not found" });
-    }
-
-    // Check if the user is an admin (you can customize this based on your authentication system)
-    if (req.user.role !== "admin") {
-      return res
-        .status(403)
-        .json({ message: "Only admins can comment on reports" });
-    }
-
-    // Add the comment to the report
-    report.comments.push({
-      user: req.user.userId, // Assuming the admin is authenticated and their ID is in req.user
-      comment,
-    });
-
-    await report.save();
-
-    return res.status(200).json({
-      message: "Comment added successfully",
-      report,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
   }
-});
+);
 
 router.post(
   "/send-email/:userId",
   verifyAdmin,
   checkAdmin,
+  checkAccountLock,
   async (req, res) => {
     try {
       const { content } = req.body;
@@ -130,36 +137,42 @@ router.post(
 );
 
 // Route to get a specific report (for both users and admins to view)
-router.get("/report/:reportId", verifyToken, async (req, res) => {
-  try {
-    const { reportId } = req.params;
+router.get(
+  "/report/:reportId",
+  verifyToken,
+  checkAccountLock,
+  async (req, res) => {
+    try {
+      const { reportId } = req.params;
 
-    const report = await reportSchema
-      .findById({ _id: reportId })
-      .populate("user", "name email")
-      .populate("comments.user", "name");
+      const report = await reportSchema
+        .findById({ _id: reportId })
+        .populate("user", "name email")
+        .populate("comments.user", "name");
 
-    const userDetails = await userSchema
-      .find({ _id: report.user })
-      .select(
-        "-password -role -createdAt -wishlist -resetPasswordToken -resetPasswordExpires -userUpdated -failedLoginAttempts -lockUntil"
-      );
-    if (!report) {
-      return res.status(404).json({ message: "Report not found" });
+      const userDetails = await userSchema
+        .find({ _id: report.user })
+        .select(
+          "-password -role -createdAt -wishlist -resetPasswordToken -resetPasswordExpires -userUpdated -failedLoginAttempts -lockUntil"
+        );
+      if (!report) {
+        return res.status(404).json({ message: "Report not found" });
+      }
+
+      return res.status(200).json({
+        report,
+        userDetails,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Server error" });
     }
-
-    return res.status(200).json({
-      report,
-      userDetails,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
   }
-});
+);
 
 router.post(
   "/update/report/:reportId/status",
   verifyToken,
+  checkAccountLock,
   async (req, res) => {
     try {
       const { reportId } = req.params;
@@ -176,7 +189,7 @@ router.post(
   }
 );
 
-router.get("/user/reports", verifyToken, async (req, res) => {
+router.get("/user/reports", verifyToken, checkAccountLock, async (req, res) => {
   try {
     const userId = req.user.userId;
     const reports = await reportSchema.find({ user: userId });
@@ -190,19 +203,25 @@ router.get("/user/reports", verifyToken, async (req, res) => {
   }
 });
 // Route to get all reports (for admin purposes)
-router.get("/reports", verifyAdmin, checkAdmin, async (req, res) => {
-  try {
-    const reports = await reportSchema.find().populate("user", "name email");
-    const userDetails = await userSchema
-      .find({ _id: reports.user, role: "user" })
-      .select(
-        "-password -role -createdAt -wishlist -resetPasswordToken -resetPasswordExpires -userUpdated -failedLoginAttempts -lockUntil"
-      );
+router.get(
+  "/reports",
+  verifyAdmin,
+  checkAdmin,
+  checkAccountLock,
+  async (req, res) => {
+    try {
+      const reports = await reportSchema.find().populate("user", "name email");
+      const userDetails = await userSchema
+        .find({ _id: reports.user, role: "user" })
+        .select(
+          "-password -role -createdAt -wishlist -resetPasswordToken -resetPasswordExpires -userUpdated -failedLoginAttempts -lockUntil"
+        );
 
-    return res.status(200).json({ reports, userDetails });
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
+      return res.status(200).json({ reports, userDetails });
+    } catch (error) {
+      res.status(500).json({ message: "Server error" });
+    }
   }
-});
+);
 
 module.exports = router;
