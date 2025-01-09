@@ -187,7 +187,9 @@ router.post("/order", verifyToken, checkAccountLock, async (req, res) => {
       SECRET_KEY
     ).toString(CryptoJS.enc.Base64);
 
-    if (UserCode === recalculatedHash) {
+      if (UserCode !== recalculatedHash) {
+      return res.status(403).json({ message: "Data has Tampered." });
+    }
       if (
         !options ||
         !options.amount ||
@@ -258,9 +260,6 @@ router.post("/order", verifyToken, checkAccountLock, async (req, res) => {
 
       await paymentHistory.save();
        res.json({ order });
-    } else {
-      return res.status(403).json({ message: "Data has Tampered." });
-    }
   } catch (error) {
     console.log(error);
     res.status(500).send({ message: "Internal Server Error" });
