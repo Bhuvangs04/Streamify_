@@ -20,6 +20,7 @@ import {
   Upload,
   BarChart3,
   LogOut,
+  ShieldCheck
 } from "lucide-react";
 
 const fetchUserRole = async () => {
