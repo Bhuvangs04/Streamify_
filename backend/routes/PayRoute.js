@@ -38,7 +38,7 @@ router.post(
         userId,
       });
       await plan.save();
-      return res.status(201).json({ message: "Plan added successfully" });
+       res.status(201).json({ message: "Plan added successfully" });
     } catch (error) {
       return res.status(500).json({ message: "Internal server error" });
     }
@@ -61,7 +61,7 @@ router.get(
       if (!plan) {
         return res.status(404).json({ message: "Plan not found." });
       }
-      return res
+       res
         .status(200)
         .json({
           createdBy: plan.userId.username,
@@ -94,7 +94,7 @@ router.patch(
         { id: plan_id },
         { name, price, month, description, devices }
       );
-      return res.status(200).json({ message: "Plan updated successfully." });
+       res.status(200).json({ message: "Plan updated successfully." });
     } catch (error) {
       return res.status(500).json({ message: "Internal server error" });
     }
@@ -115,7 +115,7 @@ router.post(
         return res.status(404).json({ message: "Plan not found." });
       }
       await PlanSchema.findOneAndUpdate({ id: plan_id }, { status });
-      return res
+       res
         .status(200)
         .json({ message: "Plan status updated successfully." });
     } catch (error) {
@@ -137,7 +137,7 @@ router.delete(
         return res.status(404).json({ message: "Plan not found." });
       }
       await PlanSchema.findOneAndDelete({ id: plan_id });
-      return res.status(200).json({ message: "Plan deleted successfully." });
+       res.status(200).json({ message: "Plan deleted successfully." });
     } catch (error) {
       return res.status(500).json({ message: "Internal server error" });
     }
@@ -149,7 +149,7 @@ router.get("/admin/plans", verifyToken,checkAccountLock, async (req, res) => {
     const plans = await PlanSchema.find().select(
       "-_id -__v -userId -createdAt"
     );
-    return res.status(200).json({ plans });
+     res.status(200).json({ plans });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
   }
@@ -160,7 +160,7 @@ router.get("/plans", verifyToken, checkAccountLock, async (req, res) => {
     const plans = await PlanSchema.find({ status: true }).select(
       "-_id -__v -userId -createdAt -status"
     );
-    return res.status(200).json({ plans });
+     res.status(200).json({ plans });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
   }
@@ -257,7 +257,7 @@ router.post("/order", verifyToken, checkAccountLock, async (req, res) => {
       });
 
       await paymentHistory.save();
-      return res.json({ order });
+       res.json({ order });
     } else {
       return res.status(403).json({ message: "Data has Tampered." });
     }
