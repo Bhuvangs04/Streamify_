@@ -6,6 +6,7 @@ import "../../styles/video.css";
 import NavbarPage from "./NavBar";
 import DeviceLimitModal from "./DeviceLimitModal";
 import CustomVideoPlayerPage from "@/components/VideoPlayer/CustomVideoPlayer";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = "https://streamify-o1ga.onrender.com";
 const MOVIES_API_URL = `${API_BASE_URL}/api/movies`;
@@ -37,17 +38,29 @@ export function Main() {
   const [currentTime, setCurrentTime] = useState(0);
   const [loading, setLoading] = useState(false);
   const videoRef = useRef(null);
+  const navigate = useNavigate();
 
   const {
     data: movies = [],
     isLoading,
     isError,
     error,
-  } = useQuery("movies", fetchMovies, {
-    staleTime: 5 * 60 * 1000,
-    cacheTime: 10 * 60 * 1000,
-    retry: 2,
-  });
+  } = useQuery(
+    "movies",
+    fetchMovies, {
+      onError: (error) => {
+        if (error.response?.status === 403) {
+          navigate("/suspend");
+        }
+      },
+    },
+    {
+      staleTime: 5 * 60 * 1000,
+      cacheTime: 10 * 60 * 1000,
+      retry: 2,
+    },
+   
+  );
 
   useEffect(() => {
     if (movies.length > 0) {
