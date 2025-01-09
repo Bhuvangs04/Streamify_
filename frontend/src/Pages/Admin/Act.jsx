@@ -97,7 +97,7 @@ const SuspiciousActivities = () => {
                 Suspicious Order
               </h3>
             </div>
-            {order.status === "pending" && (
+            {order.status === "Pending" && (
               <button
                 onClick={() => handleAccountStatus(order,true)}
                 className="flex items-center px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
@@ -115,7 +115,7 @@ const SuspiciousActivities = () => {
                 Unlock Account
               </button>
             )}
-            {order.status === "resolved" && (
+            {order.status === "Resolved" && (
               <span className="text-green-500 font-medium">Resolved</span>
             )}
           </div>
