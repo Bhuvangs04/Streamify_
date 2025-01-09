@@ -41,17 +41,18 @@ import TransferPages from "@/Pages/Client/Transer";
 // Client routes array
 const ClientRoutes = [
   // Public routes
-  { path: PATHS.LOGIN, element: <LoginPage /> },
-  { path: PATHS.FORGET, element: <Forget /> },
+  { path: PATHS.LOGIN, element: <LoginPage /> , isProtected: false},
+  { path: PATHS.FORGET, element: <Forget />, isProtected: false },
   {
     path: PATHS.RESET_PASSWORD,
     element: <ResetPassword />,
     isProtected: false,
   },
-  { path: PATHS.SIGNUP, element: <CreateAccountPage /> },
+  { path: PATHS.SIGNUP, element: <CreateAccountPage />, isProtected: false },
   {
     path: PATHS.UNAUTHORIZED,
     element: <UnauthorizedPage />,
+     isProtected: false
   },
   {
     path: PATHS.HISTORY_PAGE,
@@ -59,7 +60,7 @@ const ClientRoutes = [
   },
   {
     path: PATHS.SUSPEND_PAGE,
-    element: <SuspendPage />,
+    element: <SuspendPage />, isProtected: false
   },
   // Protected routes
   { path: PATHS.HOME, element: <Main />,isProtected: true },
@@ -89,7 +90,7 @@ const ClientRoutes = [
   },
 
   // Catch-all route
-  { path: PATHS.NOT_FOUND, element: <NotFound /> },
+  { path: PATHS.NOT_FOUND, element: <NotFound />, isProtected: false },
 ];
 
 export default ClientRoutes;
