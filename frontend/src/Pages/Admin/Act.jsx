@@ -10,6 +10,7 @@ import {
   FiUnlock,
 } from "react-icons/fi";
 import { useQuery } from "react-query";
+import {X} from "lucide-react";
 
 
 const fetchSuspiciousActivities = async (page, limit) => {
@@ -79,6 +80,13 @@ const SuspiciousActivities = () => {
 
   const renderSuspiciousOrders = () => (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+             <button
+            onClick={() => navigate("/users/statics")}
+            className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <X className="h-6 w-6 text-gray-500" />
+          </button>
+
       {activities.suspiciousOrders.map((order) => (
         <div
           key={order._id}
