@@ -1,6 +1,7 @@
 const express = require("express");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
+const CryptoJS = require("crypto-js");
 const router = express.Router();
 const nodemailer = require("nodemailer");
 const userSchema = require("../models/User");
@@ -8,77 +9,97 @@ const paymentSchema = require("../models/Payment");
 const RefundSchema = require("../models/RefundDetails");
 const payHistorySchema = require("../models/payhistory");
 const PlanSchema = require("../models/PaymentSchema");
+const SuspiciousOrder = require("../models/AmountTampering");
 const axios = require("axios");
 const { verifyToken, verifyAdmin } = require("../middleware/verify");
 const checkAdmin = require("../middleware/Admin");
+const { checkAccountLock } = require("../middleware/verify");
 require("dotenv").config();
-
-
-
-router.post("/plans/new", verifyToken,verifyAdmin,checkAdmin, async (req, res) => {
-  const userId = req.user.userId;
-  try {
-    const {id,name,price,month,description,devices} = req.body;
-    if(!id || !name || !price || !month || !description || !devices){
-      return res.status(400).json({message:"All fields are required"});
+const SECRET_KEY = "SecureOnlyPassword"; 
+router.post(
+  "/plans/new",
+  verifyToken,
+  verifyAdmin,
+  checkAdmin,
+  async (req, res) => {
+    const userId = req.user.userId;
+    try {
+      const { id, name, price, month, description, devices } = req.body;
+      if (!id || !name || !price || !month || !description || !devices) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
+      const plan = new PlanSchema({
+        id,
+        name,
+        price,
+        month,
+        description,
+        devices,
+        userId,
+      });
+      await plan.save();
+      return res.status(201).json({ message: "Plan added successfully" });
+    } catch (error) {
+      return res.status(500).json({ message: "Internal server error" });
     }
-    const plan = new PlanSchema({
-      id,
-      name,
-      price,
-      month,
-      description,
-      devices,
-      userId,
-    });
-    await plan.save();
-    return res.status(201).json({message:"Plan added successfully"});
-  } catch (error) {
-    return res.status(500).json({message:"Internal server error"});
   }
-});
+);
 
-router.get("/plans/:plan_id/createdBy", verifyToken,verifyAdmin,checkAdmin, async (req, res) => {
-  const { plan_id } = req.params;
-  try {
-    const plan = await PlanSchema.findOne({ id: plan_id }).populate(
-      "userId",
-      "username role"
-    );
+router.get(
+  "/plans/:plan_id/createdBy",
+  verifyToken,
+  verifyAdmin,
+  checkAdmin,
+  async (req, res) => {
+    const { plan_id } = req.params;
+    try {
+      const plan = await PlanSchema.findOne({ id: plan_id }).populate(
+        "userId",
+        "username role"
+      );
 
-    if (!plan) {
-      return res.status(404).json({ message: "Plan not found." });
+      if (!plan) {
+        return res.status(404).json({ message: "Plan not found." });
+      }
+      return res
+        .status(200)
+        .json({
+          createdBy: plan.userId.username,
+          role: plan.userId.role,
+          description: plan.description,
+        });
+    } catch (error) {
+      return res.status(500).json({ message: "Internal server error" });
     }
-    return res
-      .status(200)
-      .json({ createdBy: plan.userId.username, role: plan.userId.role,description:plan.description });
-  } catch (error) {
-    return res.status(500).json({ message: "Internal server error" });
   }
-});
+);
 
-router.patch("/update/plan/current/:plan_id", verifyToken,verifyAdmin,checkAdmin, async (req, res) => {
-  const { plan_id } = req.params;
-  try {
-    const plan = await PlanSchema.findOne({ id: plan_id });
-    if (!plan) {
-      return res.status(404).json({ message: "Plan not found." });
+router.patch(
+  "/update/plan/current/:plan_id",
+  verifyToken,
+  verifyAdmin,
+  checkAdmin,
+  async (req, res) => {
+    const { plan_id } = req.params;
+    try {
+      const plan = await PlanSchema.findOne({ id: plan_id });
+      if (!plan) {
+        return res.status(404).json({ message: "Plan not found." });
+      }
+      const { name, price, month, description, devices } = req.body;
+      if (!name || !price || !month || !description || !devices) {
+        return res.status(400).json({ message: "All fields are required." });
+      }
+      await PlanSchema.findOneAndUpdate(
+        { id: plan_id },
+        { name, price, month, description, devices }
+      );
+      return res.status(200).json({ message: "Plan updated successfully." });
+    } catch (error) {
+      return res.status(500).json({ message: "Internal server error" });
     }
-    const { name, price, month, description, devices } = req.body;
-    if (!name || !price || !month || !description || !devices) {
-      return res.status(400).json({ message: "All fields are required." });
-    }
-    await PlanSchema.findOneAndUpdate(
-      { id: plan_id },
-      { name, price, month, description, devices }
-    );
-    return res.status(200).json({ message: "Plan updated successfully." });
-  } catch (error) {
-    return res.status(500).json({ message: "Internal server error" });
   }
-});
-
-
+);
 
 router.post(
   "/plans/:plan_id/:status",
@@ -123,7 +144,7 @@ router.delete(
   }
 );
 
-router.get("/admin/plans", verifyToken, async (req, res) => {
+router.get("/admin/plans", verifyToken,checkAccountLock, async (req, res) => {
   try {
     const plans = await PlanSchema.find().select(
       "-_id -__v -userId -createdAt"
@@ -134,7 +155,7 @@ router.get("/admin/plans", verifyToken, async (req, res) => {
   }
 });
 
-router.get("/plans", verifyToken, async (req, res) => {
+router.get("/plans", verifyToken, checkAccountLock, async (req, res) => {
   try {
     const plans = await PlanSchema.find({ status: true }).select(
       "-_id -__v -userId -createdAt -status"
@@ -146,72 +167,108 @@ router.get("/plans", verifyToken, async (req, res) => {
 });
 
 // Create Razorpay order
-router.post("/order", verifyToken, async (req, res) => {
+router.post("/order", verifyToken, checkAccountLock, async (req, res) => {
   const userId = req.user.userId;
 
   if (!userId) {
     return res.status(400).send({ message: "User ID not found." });
   }
-
   try {
     const razorpay = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID,
       key_secret: process.env.RAZORPAY_KEY_SECRET,
     });
 
-    const { options } = req.body;
+    const { options, deviceDetails, UserCode } = req.body;
 
-    if (!options || !options.amount || !options.currency || !options.receipt) {
-      return res.status(400).send({ message: "Invalid payment options." });
-    }
+    const dataString = JSON.stringify(deviceDetails);
+    const recalculatedHash = CryptoJS.HmacSHA256(
+      dataString,
+      SECRET_KEY
+    ).toString(CryptoJS.enc.Base64);
 
-    if (options.receipt) {
-      const checkReceipt = await PlanSchema.findOne({
-        id: options.receipt,
+    if (UserCode === recalculatedHash) {
+      if (
+        !options ||
+        !options.amount ||
+        !options.currency ||
+        !options.receipt
+      ) {
+        return res.status(400).send({ message: "Invalid payment options." });
+      }
+
+      if (options.receipt) {
+        const checkReceipt = await PlanSchema.findOne({
+          id: options.receipt,
+        });
+
+        if (checkReceipt) {
+          if (checkReceipt.status === false) {
+            return res
+              .status(400)
+              .send({ message: "This plan no longer exists" });
+          }
+
+          if (checkReceipt.price * 100 !== options.amount) {
+            const suspiciousOrder = new SuspiciousOrder({
+              userId: user._id,
+              orderId: options.receipt,
+              amount: options.amount / 100,
+              currency: options.currency,
+              tamperingType: "Amount tampering",
+              status:"Pending",
+              isSuspicious: true,
+              additionalInfo: `Amount tampered: expected ${
+                checkReceipt.price * 100
+              } but received ${options.amount}`,
+            });
+            await suspiciousOrder.save();
+
+            return res.status(403).send({ message: "Data has been tampered" });
+          }
+        } else {
+          return res.status(404).send({ message: "Receipt not found" });
+        }
+      }
+
+      const order = await razorpay.orders.create(options);
+
+      if (!order) {
+        return res.status(500).send({ message: "Failed to create order." });
+      }
+
+      const newAmount = options.amount / 100;
+
+      // Log the order details into payment history
+      const paymentHistory = new payHistorySchema({
+        userId,
+        orderId: order.id,
+        amount: newAmount,
+        currency: options.currency,
+        status: "pending",
+        createdAt: new Date(),
+        ipAddress: deviceDetails.ip,
+        city: deviceDetails.city,
+        country: deviceDetails.country,
+        network: deviceDetails.network,
+        version: deviceDetails.version,
+        latitude: deviceDetails.latitude,
+        longitude: deviceDetails.longitude,
       });
 
-      if (checkReceipt) {
-        if (checkReceipt.status === false) {
-          return res
-            .status(400)
-            .send({ message: "This plan no longer exists" });
-        }
-
-        if (checkReceipt.price * 100 !== options.amount) {
-          return res.status(403).send({ message: "Data has been tampered" });
-        }
-      } else {
-        return res.status(404).send({ message: "Receipt not found" });
-      }
+      await paymentHistory.save();
+      return res.json({ order });
+    } else {
+      return res.status(403).json({ message: "Data has Tampered." });
     }
-
-    const order = await razorpay.orders.create(options);
-
-    if (!order) {
-      return res.status(500).send({ message: "Failed to create order." });
-    }
-
-    const newAmount = options.amount / 100;
-
-    // Log the order details into payment history
-    const paymentHistory = new payHistorySchema({
-      userId,
-      orderId: order.id,
-      amount: newAmount,
-      currency: options.currency,
-      status: "pending",
-      createdAt: new Date(),
-    });
-
-    await paymentHistory.save();
-    return res.json({ order });
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: "Internal Server Error" });
   }
 });
 
 // Validate payment
-router.post("/order/validate", verifyToken, async (req, res) => {
+router.post("/order/validate", verifyToken, checkAccountLock,async (req, res) => {
   const {
     razorpay_order_id,
     razorpay_signature,
@@ -220,6 +277,7 @@ router.post("/order/validate", verifyToken, async (req, res) => {
     WatchBy,
     PlanName,
     Month,
+    deviceDetails,
   } = req.body;
 
   const userId = req.user.userId;
@@ -335,6 +393,13 @@ router.post("/order/validate", verifyToken, async (req, res) => {
           status: "completed",
           transactionId: razorpay_payment_id,
           updatedAt: new Date(),
+          ipAddress: deviceDetails.ip,
+          city: deviceDetails.city,
+          country: deviceDetails.country,
+          network: deviceDetails.network,
+          version: deviceDetails.version,
+          latitude: deviceDetails.latitude,
+          longitude: deviceDetails.longitude,
         },
       }
     );
@@ -346,6 +411,13 @@ router.post("/order/validate", verifyToken, async (req, res) => {
       WatchBy,
       Payment_ID: razorpay_payment_id,
       lastPaymentDate: new Date(),
+      ipAddress: deviceDetails.ip,
+      city: deviceDetails.city,
+      country: deviceDetails.country,
+      network: deviceDetails.network,
+      version: deviceDetails.version,
+      latitude: deviceDetails.latitude,
+      longitude: deviceDetails.longitude,
     };
     if (payment && payment.Refunded) {
       if (payment.Refunded === true) {
@@ -441,13 +513,13 @@ router.get(
       );
       res.json(response.data);
     } catch (error) {
-      res.status(500).send({message:"Internal Server Error"});
+      res.status(500).send("Internal Server Error");
     }
   }
 );
 
 // Route to check payment details
-router.get("/payment-details/:paymentId", verifyToken, async (req, res) => {
+router.get("/payment-details/:paymentId", verifyToken, checkAccountLock,async (req, res) => {
   const { paymentId } = req.params;
 
   try {
@@ -581,7 +653,7 @@ router.post(
     } catch (error) {
       res.status(500).json({
         message: "An error occurred while processing the refund.",
-        error: error.message || error,
+        error: error.message || error, // Provide more details if available
       });
     }
   }
@@ -639,31 +711,35 @@ router.post(
 // });
 
 // Check payment reminder
-router.get("/check-payment", verifyToken, async (req, res) => {
-  const userId = req.user.userId;
-  try {
-    const user = await userSchema.findById({ _id: userId });
+router.get(
+  "/check-payment",
+  verifyToken,
+  checkAccountLock,
+  async (req, res) => {
+    const userId = req.user.userId;
+    try {
+      const user = await userSchema.findById({ _id: userId });
 
-    if (!user) {
-      return res.status(404).send("User not found.");
+      if (!user) {
+        return res.status(404).send("User not found.");
+      }
+
+      const currentDate = new Date();
+      const lastPaymentDate = new Date(user.lastPaymentDate);
+      const diffInDays = Math.floor(
+        (currentDate - lastPaymentDate) / (1000 * 3600 * 24)
+      );
+
+      // Show payment reminder if 30 days passed or user is blocked
+      if (diffInDays >= 30 || user.userBlocked === "Blocked") {
+        return res.json({ showPaymentReminder: true });
+      } else {
+        return res.json({ showPaymentReminder: false });
+      }
+    } catch (error) {
+      res.status(500).send("Internal server error");
     }
-
-    const currentDate = new Date();
-    const lastPaymentDate = new Date(user.lastPaymentDate);
-    const diffInDays = Math.floor(
-      (currentDate - lastPaymentDate) / (1000 * 3600 * 24)
-    );
-
-    // Show payment reminder if 30 days passed or user is blocked
-    if (diffInDays >= 30 || user.userBlocked === "Blocked") {
-      return res.json({ showPaymentReminder: true });
-    } else {
-      return res.json({ showPaymentReminder: false });
-    }
-  } catch (error) {
-    res.status(500).send("Internal server error");
   }
-});
-
+);
 
 module.exports = router;
