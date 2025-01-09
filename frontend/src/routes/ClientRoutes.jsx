@@ -55,17 +55,17 @@ const ClientRoutes = [
   },
   {
     path: PATHS.HISTORY_PAGE,
-    element: <HistoryPage />,
+    element: <HistoryPage />,isProtected: true
   },
   {
     path: PATHS.SUSPEND_PAGE,
     element: <SuspendPage />,
   },
   // Protected routes
-  { path: PATHS.HOME, element: <Main /> },
-  { path: PATHS.PROFILE, element: <ProfilePage /> },
-  { path: PATHS.WISHLIST, element: <WishlistPage /> },
-  { path: PATHS.PAY, element: <Payment /> },
+  { path: PATHS.HOME, element: <Main />,isProtected: true },
+  { path: PATHS.PROFILE, element: <ProfilePage />,isProtected: true },
+  { path: PATHS.WISHLIST, element: <WishlistPage />,isProtected: true },
+  { path: PATHS.PAY, element: <Payment />,isProtected: true },
   {
     path: PATHS.PAYMENT_REMINDER,
     element: <PaymentReminder />,
@@ -76,7 +76,7 @@ const ClientRoutes = [
     element: <TransferPages />,
     isProtected: true,
   },
-  { path: PATHS.REPORT_LIST, element: <ReportsList /> },
+  { path: PATHS.REPORT_LIST, element: <ReportsList />,isProtected: true },
   {
     path: PATHS.REPORT_VIEW,
     element: <UserReportViewPage />,
