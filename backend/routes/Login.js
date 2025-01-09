@@ -164,156 +164,157 @@ router.post("/login", async (req, res) => {
   const deviceDetails = data.deviceDetails;
   const userIpDetails = data.locations;
 
+  // Recalculate the hash for data integrity verification
   const dataString = JSON.stringify(data);
   const recalculatedHash = CryptoJS.HmacSHA256(dataString, SECRET_KEY).toString(
     CryptoJS.enc.Base64
   );
 
-  if (recalculatedHash === hash) {
-    if (!validator.isEmail(email)) {
-      return res.status(400).send("Invalid email format");
-    }
+  if (recalculatedHash !== hash) {
+    return res.status(400).json({ message: "Invalid data. Login failed." });
+  }
 
-    const sanitizedEmail = validator.normalizeEmail(email);
+  // Validate email format
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ message: "Invalid email format." });
+  }
+
+  const sanitizedEmail = validator.normalizeEmail(email);
     const sanitizedPassword = validator.escape(password);
 
-    try {
-      const user = await userSchema.findOne({ email: sanitizedEmail });
-      if (!user) {
-        return res.status(404).send({ message: "User not found" });
-      }
+  try {
+    const user = await userSchema.findOne({ email: sanitizedEmail });
 
-      const role = user.role;
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
 
-      if (user.isAccountLocked()) {
-        return res
-          .status(403)
-          .send({ message: "Account is locked. Try again after 15 minutes." });
-      }
+    // Check if account is locked
+    if (user.lockUntil && user.lockUntil > Date.now()) {
+      return res.status(403).json({
+        message: "Account is locked. Try again after 15 minutes.",
+      });
+    }
 
-      const isValidPassword = await user.isPasswordCorrect(sanitizedPassword);
-      let status = "failure";
-      if (!isValidPassword) {
-        user.failedLoginAttempts += 1;
-        if (user.failedLoginAttempts >= 5) {
-          user.lockUntil = new Date(Date.now() + 15 * 60 * 1000);
-          user.failedLoginAttempts = 0;
-        }
-        await user.save();
-      } else {
+    // Check password validity
+    const isValidPassword = await user.isPasswordCorrect(sanitizedPassword); // Ensure this uses bcrypt.compare
+    if (!isValidPassword) {
+      user.failedLoginAttempts += 1;
+
+      if (user.failedLoginAttempts >= 5) {
+        user.lockUntil = new Date(Date.now() + 15 * 60 * 1000);
         user.failedLoginAttempts = 0;
-        user.lockUntil = null;
-        await user.save();
-        status = "success";
       }
 
-      let isSuspicious = false;
-      const lastLogin = await loginDetailSchema
-        .findOne({ userId: user._id })
-        .sort({ loginTime: -1 })
-        .limit(1);
+      await user.save();
+      return res.status(401).json({ message: "Invalid credentials." });
+    }
 
-      if (lastLogin) {
-        if (
-          lastLogin.ip !== userIpDetails.ip ||
-          lastLogin.city !== userIpDetails.city ||
-          lastLogin.country !== userIpDetails.country
-        ) {
-          isSuspicious = true;
-        }
-      }
+    // Reset failed attempts and lock status
+    user.failedLoginAttempts = 0;
+    user.lockUntil = null;
+    await user.save();
 
-      if (isSuspicious) {
-        const suspiciousEntry = new suspiciousLoginSchema({
-          userId: user._id,
-          userName: user.username,
-          userEmail: user.email,
+    // Check for suspicious activity
+    let isSuspicious = false;
+    const lastLogin = await loginDetailSchema
+      .findOne({ userId: user._id })
+      .sort({ loginTime: -1 });
+
+    if (
+      lastLogin &&
+      (lastLogin.ip !== userIpDetails.ip ||
+        lastLogin.city !== userIpDetails.city ||
+        lastLogin.country !== userIpDetails.country)
+    ) {
+      isSuspicious = true;
+    }
+
+    // Log suspicious activity
+    if (isSuspicious) {
+      const suspiciousEntry = new suspiciousLoginSchema({
+        userId: user._id,
+        userName: user.username,
+        userEmail: user.email,
+        ipAddress: userIpDetails.ip,
+        city: userIpDetails.city,
+        country: userIpDetails.country,
+        tamperingType: "Login from new location/IP address",
+        status: "success",
+        failedLoginAttempts: user.failedLoginAttempts,
+        isSuspicious: true,
+        deviceDetails: deviceDetails,
+        additionalInfo: "Suspicious login attempt due to new location/IP.",
+        emailSended: false,
+      });
+
+      try {
+        const emailDetails = {
           ipAddress: userIpDetails.ip,
           city: userIpDetails.city,
           country: userIpDetails.country,
-          tamperingType: "Login From new Location or IP address",
-          status: status,
-          failedLoginAttempts: user.failedLoginAttempts,
-          lastFailedLoginTime: user.lastFailedLoginTime,
-          isSuspicious: true,
           deviceDetails: deviceDetails,
-          additionalInfo: "Suspicious login attempt due to new location/IP.",
-          emailSended: false,
-        });
-        try {
-          const emailDetails = {
-            ipAddress: userIpDetails.ip,
-            city: userIpDetails.city,
-            country: userIpDetails.country,
-            deviceDetails: deviceDetails,
-          };
-          await sendSuspiciousLoginEmail(
-            user.email,
-            user.username,
-            emailDetails
-          );
-          suspiciousEntry.emailSended = true;
-        } catch (error) {
-          console.error("Error sending suspicious login email:", error);
-        }
-
-        await suspiciousEntry.save();
+        };
+        await sendSuspiciousLoginEmail(user.email, user.username, emailDetails);
+        suspiciousEntry.emailSended = true;
+      } catch (error) {
+        console.error("Error sending suspicious login email:", error);
       }
-      const loginDetail = new loginDetailSchema({
-        userId: user._id,
-        username: user.username,
-        status: status,
-        ip: userIpDetails.ip,
-        network: userIpDetails.network,
-        version: userIpDetails.version,
-        city: userIpDetails.city,
-        region: userIpDetails.region,
-        regionCode: userIpDetails.region_code,
-        country: userIpDetails.country,
-        countryName: userIpDetails.country_name,
-        countryCode: userIpDetails.country_code,
-        countryCodeIso3: userIpDetails.country_code_iso3,
-        countryCapital: userIpDetails.country_capital,
-        countryTld: userIpDetails.country_tld,
-        continentCode: userIpDetails.continent_code,
-        inEu: userIpDetails.in_eu,
-        postal: userIpDetails.postal,
-        latitude: userIpDetails.latitude,
-        longitude: userIpDetails.longitude,
-        timezone: userIpDetails.timezone,
-        utcOffset: userIpDetails.utc_offset,
-        countryCallingCode: userIpDetails.country_calling_code,
-        currency: userIpDetails.currency,
-        currencyName: userIpDetails.currency_name,
-        languages: userIpDetails.languages,
-        countryArea: userIpDetails.country_area,
-        countryPopulation: userIpDetails.country_population,
-        asn: userIpDetails.asn,
-        org: userIpDetails.org,
-      });
 
-      await loginDetail.save();
-
-      // Generate token and set the cookie
-      const token = await createTokenForUser(user);
-      const option = {
-        httpOnly: true,
-        secure: true,
-        maxAge: 1 * 24 * 60 * 60 * 1000,
-        sameSite: "Strict",
-        path: "/",
-      };
-
-      return res
-        .status(200)
-        .cookie("token", token, option)
-        .json({ message: "Login successful", role });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send({ message: "Server error" });
+      await suspiciousEntry.save();
     }
-  } else {
-    res.status(400).json({ message: "Invalid data. Login failed." });
+
+    // Log the successful login
+    const loginDetail = new loginDetailSchema({
+      userId: user._id,
+      username: user.username,
+      status: "success",
+      ip: userIpDetails.ip,
+      network: userIpDetails.network,
+      version: userIpDetails.version,
+      city: userIpDetails.city,
+      region: userIpDetails.region,
+      regionCode: userIpDetails.region_code,
+      country: userIpDetails.country,
+      countryName: userIpDetails.country_name,
+      countryCode: userIpDetails.country_code,
+      countryCodeIso3: userIpDetails.country_code_iso3,
+      countryCapital: userIpDetails.country_capital,
+      countryTld: userIpDetails.country_tld,
+      continentCode: userIpDetails.continent_code,
+      inEu: userIpDetails.in_eu,
+      postal: userIpDetails.postal,
+      latitude: userIpDetails.latitude,
+      longitude: userIpDetails.longitude,
+      timezone: userIpDetails.timezone,
+      utcOffset: userIpDetails.utc_offset,
+      countryCallingCode: userIpDetails.country_calling_code,
+      currency: userIpDetails.currency,
+      currencyName: userIpDetails.currency_name,
+      languages: userIpDetails.languages,
+      countryArea: userIpDetails.country_area,
+      countryPopulation: userIpDetails.country_population,
+      asn: userIpDetails.asn,
+      org: userIpDetails.org,
+    });
+    await loginDetail.save();
+
+    // Generate token
+    const token = await createTokenForUser(user);
+    const cookieOptions = {
+      httpOnly: true,
+      secure: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      sameSite: "Strict",
+    };
+
+    return res
+      .status(200)
+      .cookie("token", token, cookieOptions)
+      .json({ message: "Login successful", role: user.role });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error." });
   }
 });
 
