@@ -15,6 +15,7 @@ const historySchema = require("../models/History");
 const otpSchema = require("../models/Otp");
 const emailChangeLogSchema = require("../models/Email");
 const { createTokenForDevice } = require("../middleware/Auth");
+const { checkAccountLock } = require("../middleware/verify");
 
 router.use((req, res, next) => {
   if (
@@ -23,7 +24,10 @@ router.use((req, res, next) => {
   ) {
     return next();
   }
-  return verifyToken(req, res, next);
+ verifyToken(req, res, (err) => {
+   if (err) return next(err);
+   checkAccountLock(req, res, next);
+ });
 });
 
 router.use((err, req, res, next) => {
@@ -160,10 +164,16 @@ router.post("/logout", async (req, res) => {
 router.post("/stop-streaming", decodeDeviceToken, async (req, res) => {
   const { userId, deviceId } = req.deviceDetails;
   const authenticatedUserId = req.user.userId;
+  const role = req.user.role;
+  if (role === "admin") {
+    return res
+      .status(200)
+      .send({ message: "Device removed from active streaming." });
+  }
   if (userId !== authenticatedUserId) {
     return res
       .status(403)
-      .send("User does not have permission to stop this device.");
+      .send({ message: "User does not have permission to stop this device." });
   }
   try {
     const userDevice = await userDeviceSchema.findOne({ userId, deviceId });
@@ -265,7 +275,7 @@ router.post("/forgot-password", async (req, res) => {
       },
     });
 
-    const resetUrl = `https://streamify-694k.onrender.com/reset-password/${resetToken}`;
+    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
     await transporter.sendMail({
       to: user.email,
       subject: "🔑 MiniNetflix Password Reset Request 🔒",
@@ -565,7 +575,6 @@ router.get(
 
     try {
       // Check Redis cache first
-    
 
       // Fetch from DB if not in cache
       const explain = await userSchema
@@ -586,8 +595,6 @@ router.get(
       if (!userDetails) {
         return res.status(404).json({ message: "User Not Found" });
       }
-
-      // Cache the user details for future requests
 
       return res.status(200).json({ message: "Success", userDetails });
     } catch (err) {
