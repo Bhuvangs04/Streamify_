@@ -5,7 +5,6 @@ import {
   FiUser,
   FiClock,
   FiMapPin,
-  FiDollarSign,
   FiLock,
   FiUnlock,
 } from "react-icons/fi";
@@ -125,7 +124,6 @@ const SuspiciousActivities = () => {
               User Id: {order.userId}
             </p>
             <p className="flex items-center text-gray-700">
-              <FiDollarSign className="mr-2 text-red-500" />
               <span className="font-medium">{order.amount}</span>{" "}
               {order.currency}
             </p>
