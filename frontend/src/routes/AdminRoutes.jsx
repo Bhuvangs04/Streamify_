@@ -11,6 +11,7 @@ import PaymentManagement from "../Pages/Admin/ActiveUsers";
 import RefundChatBotPage from "@/Pages/Admin/RefundChatbot";
 import PlanAdd from "@/Pages/Admin/PlanAdd";
 import EmailChangeLogsPage from "@/Pages/Admin/EmailLogs";
+import NewRoute from"@/Pages/Admin/Act"
 
 const AdminRoutes = [
   { path: "/admin/reports", element: <AdminReportsPage />, isProtected: true },
@@ -22,6 +23,11 @@ const AdminRoutes = [
   {
     path: "/admin/add/plans",
     element: <PlanAdd />,
+    isProtected: true,
+  },
+    {
+    path: "/admin/activites",
+    element: <NewRoute />,
     isProtected: true,
   },
   {
