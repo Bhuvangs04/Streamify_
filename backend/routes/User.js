@@ -122,9 +122,9 @@ router.get("/getRole", async (req, res) => {
 
     const userStatus = await userSchema.findOne({ _id: userID });
     const user = userStatus.userBlocked;
-    return res.status(200).json({ role, user });
+     res.status(200).json({ role, user });
   } catch (error) {
-    return res.status(500).send({ error: "Failed to get Role." });
+     res.status(500).send({ error: "Failed to get Role." });
   }
 });
 
@@ -155,9 +155,10 @@ router.post("/logout", async (req, res) => {
     // Clear the token cookie from the client
     res.clearCookie("token");
 
-    return res.status(200).send({ message: "Logged out successfully." });
+     res.status(200).send({ message: "Logged out successfully." });
+    
   } catch (err) {
-    return res.status(500).send({ error: "Failed to logout." });
+    res.status(500).send({ error: "Failed to logout." });
   }
 });
 
@@ -182,7 +183,7 @@ router.post("/stop-streaming", decodeDeviceToken, async (req, res) => {
     }
     userDevice.isActive = false;
     await userDevice.save();
-    return res
+     res
       .status(200)
       .send({ message: "Device removed from active streaming." });
   } catch (err) {
@@ -199,7 +200,7 @@ router.get("/history", verifyToken, async (req, res) => {
     });
     res.status(200).json({ success: true, movies });
   } catch (error) {
-    return res
+     res
       .status(500)
       .json({ message: "An error occurred while fetching user details." });
   }
@@ -218,7 +219,7 @@ router.get("/active-devices", async (req, res) => {
       .find({ userId })
       .select("-userId -Payment_ID");
 
-    return res.status(200).json({ activeDevices, WatchBy });
+    res.status(200).json({ activeDevices, WatchBy });
   } catch (err) {
     res.status(500).send("Error fetching active devices: " + err.message);
   }
