@@ -1,15 +1,51 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
-const { verifyToken,verifyAdmin } = require("../middleware/verify");
+const { verifyToken, verifyAdmin } = require("../middleware/verify");
 const userSchema = require("../models/User");
 const paymentSchema = require("../models/Payment");
 const RefundSchema = require("../models/RefundDetails");
+const AmountTamp = require("../models/AmountTampering");
 const payHistorySchema = require("../models/payhistory");
 const movieSchema = require("../models/Movies");
 const EmailChangeLog = require("../models/Email");
 const router = express.Router();
 require("dotenv").config();
 const checkAdmin = require("../middleware/Admin");
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+const sendAccountStatusEmail = async (userEmail, userName, status) => {
+  let subject = status ? "Account Suspended" : "Account Unlocked";
+  let message = status
+    ? "Your account has been temporarily locked due to suspicious activity."
+    : "Your account has been successfully unlocked.";
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: userEmail,
+    subject: subject,
+    html: `
+      <h1>${subject}</h1>
+      <p>Hello ${userName},</p>
+      <p>${message}</p>
+      <p>If this was not you, please contact support immediately.</p>
+      <p>Best regards, <br>Your Support Team</p>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Email sent successfully!");
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+};
 
 router.get(
   "/user/email/change-logs",
@@ -25,6 +61,39 @@ router.get(
       return res.status(200).json({ emailChangeLogs });
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+);
+
+router.post(
+  "/lock/account/:userId/:status",
+  verifyToken,
+  verifyAdmin,
+  checkAdmin,
+  async (req, res) => {
+    try {
+      const { userId, status } = req.params;
+      const user = await userSchema.findById(userId);
+      if (!user) {
+        return res.status(403).send({ message: "No User Found" });
+      }
+      const details = await AmountTamp.findById({ userId: userId });
+
+      user.AccountLocked = status;
+      await user.save();
+      if (details && user.AccountLocked === false) {
+        details.status = "Resolved";
+        await details.save();
+      }
+      if (details && user.AccountLocked === true) {
+        details.status = "locked";
+        await details.save();
+      }
+      await sendAccountStatusEmail(user.email, user.username, status);
+
+      return res.status(200).send({ messsage: "Locked Successfuly" });
+    } catch (error) {
+      return res.status(503).json({ message: "Server broke" });
     }
   }
 );
@@ -72,7 +141,6 @@ router.get(
         },
       };
 
-
       // Respond with filtered data
       res.status(200).json(refundData);
     } catch (error) {
@@ -80,6 +148,72 @@ router.get(
     }
   }
 );
+const SuspiciousOrder = require("../models/AmountTampering");
+const suspiciousLoginSchema = require("../models/SuspiciousLogin");
+const loginDetailSchema = require("../models/LoginDetails");
+
+router.get("/Suspicous-Act", verifyAdmin, verifyToken, async (req, res) => {
+  try {
+    // Pagination parameters (default to page 1 and limit to 10 records per page)
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    // Calculate the number of items to skip
+    const skip = (page - 1) * limit;
+
+    // Fetch suspicious orders with pagination
+    const suspiciousOrders = await SuspiciousOrder.find()
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    // Fetch suspicious logins with pagination
+    const suspiciousLogins = await suspiciousLoginSchema
+      .find()
+      .skip(skip)
+      .limit(limit)
+      .sort({ loginTime: -1 });
+
+    // Fetch recent login details with pagination
+    const recentLoginDetails = await loginDetailSchema
+      .find()
+      .skip(skip)
+      .limit(limit)
+      .sort({ loginTime: -1 });
+
+    // Get total count for pagination info
+    const totalOrders = await SuspiciousOrder.countDocuments();
+    const totalLogins = await suspiciousLoginSchema.countDocuments();
+    const totalLoginDetails = await loginDetailSchema.countDocuments();
+
+    // Calculate the total number of pages
+    const totalPagesOrders = Math.ceil(totalOrders / limit);
+    const totalPagesLogins = Math.ceil(totalLogins / limit);
+    const totalPagesLoginDetails = Math.ceil(totalLoginDetails / limit);
+
+    // Send response with pagination data
+    return res.status(200).json({
+      suspiciousOrders,
+      suspiciousLogins,
+      recentLoginDetails,
+      pagination: {
+        page,
+        limit,
+        totalOrders,
+        totalLogins,
+        totalLoginDetails,
+        totalPagesOrders,
+        totalPagesLogins,
+        totalPagesLoginDetails,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching suspicious activities:", error);
+    return res
+      .status(500)
+      .json({ message: "Failed to fetch suspicious activities" });
+  }
+});
 
 router.get("/activeUsers", verifyToken, verifyAdmin, async (req, res) => {
   try {
@@ -295,21 +429,13 @@ router.post(
       });
       const activeUsers = totalUsers - blockedUsers;
       const paidUsers = await paymentSchema.aggregate([
-  {
-    $group: {
-      _id: "$userId",
-      totalPaid: { $sum: { $toDouble: "$Paid" } },
-      Refunded: { $max: "$Refunded" }, 
-    },
-  },
-  {
-    $match: {
-      Refunded: false,
-    },
-  },
-]);
-
-
+        {
+          $group: {
+            _id: "$userId",
+            totalPaid: { $sum: { $toDouble: "$Paid" } },
+          },
+        },
+      ]);
       const totalRevenue = paidUsers.reduce(
         (acc, user) => acc + user.totalPaid,
         0
@@ -362,6 +488,5 @@ router.post(
     }
   }
 );
-
 
 module.exports = router;
