@@ -1,6 +1,7 @@
 const JWT = require("jsonwebtoken");
 const Secret = "SecureOnlyPassword";
 const JsonWebToken = require("../models/UserJsonToken");
+const User = require("../models/User")
 
 
 async function verifyToken(req, res, next) {
@@ -28,6 +29,26 @@ async function verifyToken(req, res, next) {
   }
 }
 
+const checkAccountLock = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.userId);
+    if (user.role === "admin") {
+      next();
+    }
+    if (user && user.AccountLocked) {
+      return res.status(403).json({
+        message:
+          "Your account has been locked due to suspicious activity. Please contact support.",
+          status:"true"
+      });
+    }
+    next();
+  } catch (error) {
+    res.status(500).json({ message: "Server error." });
+  }
+};
+
+
 function decodeDeviceToken(req, res, next) {
   const authHeader = req.headers["authorization"];
 
@@ -36,6 +57,7 @@ function decodeDeviceToken(req, res, next) {
   }
 
   const deviceToken = authHeader.split(" ")[1];
+   
 
   if (!deviceToken || typeof deviceToken !== "string") {
     return res.status(401).send("Device token is missing or not a string.");
@@ -46,7 +68,9 @@ function decodeDeviceToken(req, res, next) {
     req.deviceDetails = decoded;
     next();
   } catch (err) {
-    return res.status(403).send("Invalid or expired device token.");
+    return res
+      .status(403)
+      .send({ message: "Invalid or expired device token." });
   }
 }
 
@@ -69,4 +93,9 @@ function verifyAdmin(req, res, next){
   }
 };
 
-module.exports = { verifyToken, verifyAdmin, decodeDeviceToken };
+module.exports = {
+  verifyToken,
+  verifyAdmin,
+  decodeDeviceToken,
+  checkAccountLock,
+};
