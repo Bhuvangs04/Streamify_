@@ -120,6 +120,13 @@ export default function NavbarPage() {
                 >
                   Email Change Logs
                 </Link>
+                 <Link
+                  to="/admin/activites"
+                  className="nav-link hover:text-purple-200 transition-colors duration-200"
+                >
+                  <ShieldCheck className="inline-block mr-1 h-4 w-4" />
+                  User Activites
+                </Link>
                 <Link
                   to="/admin/payments"
                   className="nav-link hover:text-purple-200 transition-colors duration-200"
