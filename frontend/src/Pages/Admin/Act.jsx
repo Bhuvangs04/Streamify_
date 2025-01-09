@@ -11,6 +11,7 @@ import {
 } from "react-icons/fi";
 import { useQuery } from "react-query";
 import {X} from "lucide-react";
+import {useNavigate} from "react-router-dom"
 
 
 const fetchSuspiciousActivities = async (page, limit) => {
@@ -63,6 +64,8 @@ const SuspiciousActivities = () => {
   const [activeTab, setActiveTab] = useState("orders");
   const currentPage = 1;
   const limit = 10;
+    const navigate = useNavigate();
+
 
 
    const { data, isLoading, error } = useQuery(
@@ -80,12 +83,7 @@ const SuspiciousActivities = () => {
 
   const renderSuspiciousOrders = () => (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-             <button
-            onClick={() => navigate("/users/statics")}
-            className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <X className="h-6 w-6 text-gray-500" />
-          </button>
+ 
 
       {activities.suspiciousOrders.map((order) => (
         <div
@@ -236,6 +234,12 @@ const SuspiciousActivities = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
+       <button
+        onClick={() => navigate("/users/statics")}
+        className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+      >
+        <X className="h-6 w-6 text-gray-500" />
+      </button>
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
