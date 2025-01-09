@@ -180,6 +180,18 @@ const UserProfile = () => {
                         {user.userBlocked === "Blocked" ? "Blocked" : "Active"}
                       </span>
                     </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Account-Lock</p>
+                      <span
+                        className={`inline-block px-2 py-1 text-xs rounded-full ${
+                          user.AccountLocked === true
+                            ? "bg-red-100 text-red-800"
+                            : "bg-green-100 text-green-800"
+                        }`}
+                      >
+                        {user.AccountLocked === true ? "Lock" : "Active"}
+                      </span>
+                    </div>
                   </div>
 
                   <div>
