@@ -4,8 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { toast, Toaster } from "sonner";
 import { useQuery } from "react-query";
 import { X } from "lucide-react";
+import CryptoJS from "crypto-js";
 
 axios.defaults.withCredentials = true;
+
+const SECRET_KEY = "SecureOnlyPassword"; // Keep this secret on the backend
 
 const PaymentPlan = lazy(() => import("./PaymentPlan"));
 
@@ -50,21 +53,39 @@ const PaymentPage = () => {
     retry: 2,
   });
 
-useEffect(() => {
-  const scriptId = "razorpay-checkout-script";
-
-  // Check if the script is already loaded
-  if (!document.getElementById(scriptId)) {
+  useEffect(() => {
     const script = document.createElement("script");
-    script.id = scriptId;
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
     document.body.appendChild(script);
-  }
 
-  // No need to remove the script on cleanup
-}, []);
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
+  }, []);
 
+  const getUserDetails = async () => {
+    try {
+      // Get public IP
+      const ipResponse = await fetch("https://api.ipify.org?format=json");
+      const ipData = await ipResponse.json();
+
+      // Get location details using IP
+      const locationResponse = await fetch(
+        `https://ipapi.co/${ipData.ip}/json/`
+      );
+      const ipDetails = await locationResponse.json();
+
+      return {
+        ipDetails,
+      };
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+      return null;
+    }
+  };
 
   const handlePayment = async (plan) => {
     try {
@@ -76,6 +97,30 @@ useEffect(() => {
         return;
       }
 
+      const ipDetails = await getUserDetails();
+      const ip = ipDetails.ipDetails.ip;
+      const country = ipDetails.ipDetails.country_name;
+      const city = ipDetails.ipDetails.city;
+      const longitude =ipDetails.ipDetails.longitude;
+      const network = ipDetails.ipDetails.network;
+      const version = ipDetails.ipDetails.version;
+      const latitude = ipDetails.ipDetails.latitude;
+
+     const deviceDetails = {
+       ip: ip,
+       country: country,
+       city: city,
+       longitude: longitude,
+       network: network,
+       version: version,
+       latitude:latitude,
+     };
+
+      const dataString = JSON.stringify(deviceDetails);
+      const UserCode = CryptoJS.HmacSHA256(dataString, SECRET_KEY).toString(
+        CryptoJS.enc.Base64
+      );
+
       const response = await axios.post(
         "https://streamify-o1ga.onrender.com/api/payment/order",
         {
@@ -84,6 +129,8 @@ useEffect(() => {
             currency: "INR",
             receipt: `${plan.id}`,
           },
+          deviceDetails,
+          UserCode,
         },
         { withCredentials: true }
       );
@@ -114,6 +161,7 @@ useEffect(() => {
                 WatchBy: plan.devices,
                 PlanName: plan.name,
                 Month: plan.month,
+                deviceDetails,
               },
               { withCredentials: true }
             );
@@ -149,6 +197,7 @@ useEffect(() => {
       });
       rzp.open();
     } catch (error) {
+      console.log(error)
       setError("Payment initiation failed.");
       setTimeout(() => {
         setError(null);
