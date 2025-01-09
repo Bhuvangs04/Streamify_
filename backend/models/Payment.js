@@ -10,8 +10,15 @@ const paymentSchema = new mongoose.Schema(
     lastPaymentDate: { type: Date, default: Date.now, required: true },
     Payment_ID: { type: String, required: true },
     PlanName: { type: String, required: true },
-    Month:{ type: String, required: true },
-    Refunded:{ type: Boolean, default: false },
+    Month: { type: String, required: true },
+    Refunded: { type: Boolean, default: false },
+    ipAddress: { type: String, required: true },
+    city: { type: String, required: true },
+    country: {type:String,required:true},
+    network: {type:String,required:true},
+    version: {type:String,required:true},
+    latitude: {type:String,required:true},
+    longitude: {type:String,required:true}
   },
   { timestamps: true }
 );
