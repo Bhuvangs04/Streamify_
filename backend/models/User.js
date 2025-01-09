@@ -17,6 +17,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    AccountLocked: {
+      type: Boolean,
+      default: false,
+    },
     password: {
       type: String,
       required: true,
@@ -53,6 +57,7 @@ const userSchema = new mongoose.Schema(
       type: Date,
     },
     failedLoginAttempts: { type: Number, default: 0 },
+    lastFailedLoginTime: { type: Date, default: Date.now },
     lockUntil: { type: Date, default: null },
   },
   { timestamps: true }
