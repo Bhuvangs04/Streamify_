@@ -12,6 +12,7 @@ import { useQuery } from "react-query";
 import {X} from "lucide-react";
 import {useNavigate} from "react-router-dom"
 import { toast } from "sonner";
+import ReactPaginate from "react-paginate"; // Optional: For better pagination UI
 
 
 const fetchSuspiciousActivities = async (page, limit) => {
@@ -68,18 +69,29 @@ const SuspiciousActivities = () => {
 
 
 
-   const { data, isLoading, error } = useQuery(
-     ["suspiciousActivities", currentPage, limit],
-     () => fetchSuspiciousActivities(currentPage, limit),
-     {
-       keepPreviousData: true,
-     }
-   );
+  const { data, isLoading, error } = useQuery(
+    ["suspiciousActivities", currentPage, limit],
+    () => fetchSuspiciousActivities(currentPage, limit),
+    {
+      keepPreviousData: true,
+    }
+  );
+
 
    if (isLoading) return <div>Loading...</div>;
    if (error) return <div>Error: {error.message}</div>;
 
    const activities = data;
+  const totalPages =
+    activeTab === "orders"
+      ? Math.ceil(activities.pagination.totalOrders / limit)
+      : activeTab === "logins"
+      ? Math.ceil(activities.pagination.totalLogins / limit)
+      : Math.ceil(activities.pagination.totalLoginDetails / limit);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page.selected + 1); // React Paginate uses zero-based index
+  };
 
   const renderSuspiciousOrders = () => (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -279,30 +291,21 @@ const SuspiciousActivities = () => {
         </div>
 
         <div className="flex justify-center mt-6">
-          <nav className="bg-white px-4 py-3 rounded-lg shadow-lg">
-            <div className="flex items-center space-x-4">
-              <button
-                disabled={currentPage === 1}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Previous
-              </button>
-              <span className="text-gray-600">Page {currentPage}</span>
-              <button
-                disabled={
-                  currentPage >=
-                  Math.ceil(
-                    activities.pagination.totalOrders /
-                      activities.pagination.limit
-                  )
-                }
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Next
-              </button>
-            </div>
-          </nav>
-        </div>
+          <ReactPaginate
+            previousLabel={"Previous"}
+            nextLabel={"Next"}
+            breakLabel={"..."}
+            pageCount={totalPages}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={3}
+            onPageChange={handlePageChange}
+            containerClassName={"pagination"}
+            activeClassName={"active"}
+            disabledClassName={"disabled"}
+            previousClassName={"prev-btn"}
+            nextClassName={"next-btn"}
+          />
+        </div>  
       </div>
     </div>
   );
