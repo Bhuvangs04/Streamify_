@@ -192,19 +192,25 @@ router.post("/stop-streaming", decodeDeviceToken, async (req, res) => {
 });
 
 router.get("/history", verifyToken, async (req, res) => {
-  const userId = req.user.userId;
+  const userId = req.user.userId; // Assuming userId is a string or ObjectId
   try {
-    const history = await historySchema.findOne({ userId: userId });
-    const movies = await movieSchema.find({
-      _id: { $in: history.historyId },
-    });
+    // Find the history document by userId
+    const history = await historySchema.findOne({ userId: userId }).populate("historyId");
+
+    if (!history) {
+      return res.status(404).json({ message: "History not found for this user." });
+    }
+
+    // Since populate is used, history.historyId will contain full movie documents
+    const movies = history.historyId;
+
     res.status(200).json({ success: true, movies });
   } catch (error) {
-     res
-      .status(500)
-      .json({ message: "An error occurred while fetching user details." });
+    console.error("Error fetching history:", error);
+    res.status(500).json({ message: "An error occurred while fetching user details." });
   }
 });
+
 
 router.get("/active-devices", async (req, res) => {
   const userId = req.user.userId;
