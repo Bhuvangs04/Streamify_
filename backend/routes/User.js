@@ -276,7 +276,7 @@ router.post("/forgot-password", async (req, res) => {
       },
     });
 
-    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+    const resetUrl = `https://streamify-o1ga.onrender.com/reset-password/${resetToken}`;
     await transporter.sendMail({
       to: user.email,
       subject: "🔑 MiniNetflix Password Reset Request 🔒",
