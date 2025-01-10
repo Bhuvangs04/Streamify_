@@ -394,11 +394,10 @@ router.get(
           "encryption.key"
         );
 
-        return res.json({
-          status: true,
-          message: "Key access granted.",
-          fileUrl: keyPath,
-        });
+   return res.json({
+        status: true,
+        message: "Key access granted.",
+      });
       }
 
       // Check if the device token is associated with the correct user
@@ -483,8 +482,11 @@ router.get(
       }
 
       // Log the history of the user watching the movie
-      const History = new historySchema({ userId, historyId: movieId });
-      await History.save();
+  const result = await historySchema.findOneAndUpdate(
+      { userId }, // Query to find the document
+      { $addToSet: { history: movieId } }, // Add movieId only if it's not already in the array
+      { upsert: true, new: true } // Create a new document if none exists, return the updated document
+    );    
       // Send the encryption key file
       return res.json({
         status: true,
