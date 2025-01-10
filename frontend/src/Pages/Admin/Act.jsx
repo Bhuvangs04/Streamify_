@@ -125,7 +125,7 @@ const SuspiciousActivities = () => {
               User Id: {order.userId}
             </p>
             <p className="flex items-center text-gray-700">
-              <span className="font-medium">{order.amount}</span>{" "}
+              <span className="font-medium">Amount recivied:{" "}{(order.amount*100)}{""}</span>{" "}
               {order.currency}
             </p>
             <p className="flex items-center text-gray-700">
@@ -140,6 +140,9 @@ const SuspiciousActivities = () => {
             <div className="mt-3 p-2 bg-red-50 rounded">
               <p className="text-red-700 text-sm font-medium">
                 {order.tamperingType}
+              </p>
+             <p className="text-red-700 text-sm font-medium">
+                {order.additionalInfo}
               </p>
             </div>
           </div>
