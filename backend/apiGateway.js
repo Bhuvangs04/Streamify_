@@ -57,12 +57,11 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
   const allowedOrigins = ['https://streamizz.site'];
-  const allowedHosts = ['https://streamify-o1ga.onrender.com'];
+  const allowedHosts = ['streamify-o1ga.onrender.com'];
   
   // Check if the request's Origin or Host header matches the allowed values
-  const origin = req.headers.Origin;
-  const host = req.headers.authority;
-  console.log(origin,host);
+ const origin = req.headers.origin;
+  const host = req.headers.host;
 
   if (!allowedOrigins.includes(origin) || !allowedHosts.includes(host)) {
     return res.status(403).json({ message: 'Forbidden' });
