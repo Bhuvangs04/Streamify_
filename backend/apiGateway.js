@@ -57,17 +57,24 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
   const allowedOrigins = ['https://streamizz.site'];
-  const allowedHosts = ['streamify-o1ga.onrender.com'];
+  const allowedHosts = ['streamify-o1ga.onrender.com']; // This is the backend host, not the request origin
   
-  // Check if the request's Origin or Host header matches the allowed values
- const origin = req.headers.origin;
+  const origin = req.headers.origin;
   const host = req.headers.host;
 
-  if (!allowedOrigins.includes(origin) || !allowedHosts.includes(host)) {
+  // Check if the Origin is allowed
+  if (!allowedOrigins.includes(origin)) {
     return res.status(403).json({ message: 'Forbidden' });
   }
-  next();
+
+  // Check if the Host header matches the allowed backend host
+  if (!allowedHosts.includes(host)) {
+    return res.status(403).json({ message: 'Forbidden' });
+  }
+
+  next(); // If both are valid, proceed to the next middleware or route
 });
+
 
 // Serve Static Files with Headers
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
