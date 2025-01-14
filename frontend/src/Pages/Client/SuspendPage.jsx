@@ -23,11 +23,7 @@ const Index = () => {
               <p className="text-sm text-gray-300 mb-2">
                 Please contact our support team for assistance:
               </p>
-              <a
-                href="mailto:customer_care@streamizz.site"
-                className="text-suspend-accent hover:text-suspend-accent/80 font-medium transition-colors"
-              >
-                Mail us
+                Mail to this address for any query :customer_care@streamizz.site 
               </a>
             </div>
 
