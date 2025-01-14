@@ -63,7 +63,7 @@ app.use((req, res, next) => {
 
 
 const allowedOrigins = ['https://streamizz.site'];
-const allowedHosts = ['streamify-o1ga.onrender.com']; // Backend host
+const allowedHosts = ['streamify-o1ga.onrender.com',"streamizz.site"]; // Backend host
 
 app.use((req, res, next) => {
     const origin = req.headers.origin;
