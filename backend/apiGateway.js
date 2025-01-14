@@ -61,9 +61,10 @@ app.use((req, res, next) => {
     next();
 });
 
-    const allowedOrigin = 'https://streamizz.site'; // Allowed origin
-    const allowedHost = ['streamify-o1ga.onrender.com','streamizz.site']; 
+  
 app.use((req, res, next) => {
+    const allowedOrigin = ['https://streamizz.site']; 
+    const allowedHost =  ['streamify-o1ga.onrender.com', 'streamizz.site'];; 
 
     const origin = req.headers.origin; // The Origin header of the request
     const host = req.headers.host; // The Host header of the request
