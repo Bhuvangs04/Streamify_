@@ -24,7 +24,7 @@ const Index = () => {
                 Please contact our support team for assistance:
               </p>
               <a
-                href="mailto:movie.hive.2024@gmail.com"
+                href="mailto:customer_care@streamizz.site"
                 className="text-suspend-accent hover:text-suspend-accent/80 font-medium transition-colors"
               >
                 Mail us
