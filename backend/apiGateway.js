@@ -5,7 +5,6 @@ const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const cronJobs = require("./services/Clean");
-const helmet = require("helmet");
 
 // Route Handlers
 const user = require("./routes/User");
@@ -44,21 +43,6 @@ async function connectToDatabase(retries = 5) {
 app.use(express.json({ limit: "5gb" }));
 app.use(express.urlencoded({ limit: "5gb", extended: true }));
 app.use(cookieParser());
-
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        "default-src": ["'self'"],
-        "connect-src": ["'self'", "https://streamify-o1ga.onrender.com", "https://streamizz.site"], // Allow specific domains for connections
-        "script-src": ["'self'", "'unsafe-inline'"], // Adjust if you use inline scripts
-        "style-src": ["'self'", "'unsafe-inline'"],  // Adjust if you use inline styles
-        "img-src": ["'self'", "data:", "https://example.com"], // Allow images from specific domains
-        "frame-src": ["'self'", "https://example.com"], // If using iframes
-      },
-    },
-  })
-);// CORS Configuration
 const corsOptions = {
   origin: ["https://streamify-o1ga.onrender.com","https://streamizz.site"],
   credentials: true,
