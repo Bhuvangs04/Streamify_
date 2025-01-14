@@ -55,19 +55,19 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((req, res, next) => {
-  const allowedOrigins = ['https://streamizz.site'];
-  const allowedHosts = ['https://streamify-o1ga.onrender.com'];
+// app.use((req, res, next) => {
+//   const allowedOrigins = ['https://streamizz.site'];
+//   const allowedHosts = ['https://streamify-o1ga.onrender.com'];
   
-  // Check if the request's Origin or Host header matches the allowed values
-  const origin = req.headers.origin;
-  const host = req.headers.host;
+//   // Check if the request's Origin or Host header matches the allowed values
+//   const origin = req.headers.origin;
+//   const host = req.headers.host;
 
-  if (!allowedOrigins.includes(origin) || !allowedHosts.includes(host)) {
-    return res.status(403).json({ message: 'Forbidden' });
-  }
-  next();
-});
+//   if (!allowedOrigins.includes(origin) || !allowedHosts.includes(host)) {
+//     return res.status(403).json({ message: 'Forbidden' });
+//   }
+//   next();
+// });
 
 // Serve Static Files with Headers
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
