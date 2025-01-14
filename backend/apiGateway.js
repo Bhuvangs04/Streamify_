@@ -56,6 +56,16 @@ app.use((req, res, next) => {
 });
 
 
+app.use((req, res, next) => {
+  const allowedOrigin = 'https://streamizz.site';
+  const origin = req.headers.origin || req.headers.referer;
+
+  if (!origin || !origin.startsWith(allowedOrigin)) {
+    return res.status(403).json({ message: 'Forbidden: Access denied' });
+  }
+
+  next();
+});
 
 
 // Serve Static Files with Headers
