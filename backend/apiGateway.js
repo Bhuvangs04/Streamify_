@@ -62,24 +62,30 @@ app.use((req, res, next) => {
 });
 
 
-const allowedOrigins = ['https://streamizz.site'];
-const allowedHosts = ['streamify-o1ga.onrender.com',"streamizz.site"]; // Backend host
-
 app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    const host = req.headers.host;
+    const allowedOrigin = 'https://streamizz.site'; // Allowed origin
+    const allowedHost = ['streamify-o1ga.onrender.com','streamizz.site']; // Allowed backend host
 
-    // If the Origin header is present, validate it
-    if (origin && !allowedOrigins.includes(origin)) {
+    const origin = req.headers.origin; // The Origin header of the request
+    const host = req.headers.host; // The Host header of the request
+    const referer = req.headers.referer; // The Referer header of the request (optional)
+
+    // 1. Validate Origin header
+    if (origin !== allowedOrigin) {
         return res.status(403).json({ message: 'Forbidden: Invalid Origin' });
     }
 
-    // Check if the Host header matches the allowed backend host
-    if (!allowedHosts.includes(host)) {
+    // 2. Validate Host header
+    if (host !== allowedHost) {
         return res.status(403).json({ message: 'Forbidden: Invalid Host' });
     }
 
-    next(); // Proceed if validation passes
+    // 3. Optionally validate Referer header
+    if (referer && !referer.startsWith(allowedOrigin)) {
+        return res.status(403).json({ message: 'Forbidden: Invalid Referer' });
+    }
+
+    next(); // Proceed to the next middleware or route
 });
 
 
