@@ -55,6 +55,14 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  const allowedHosts = ['https://streamizz.site'];
+  if (!allowedHosts.includes(req.headers.host)) {
+    return res.status(403).json({message:'Forbidden'});
+  }
+  next();
+});
+
 // Serve Static Files with Headers
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.set("view engine", "ejs");
