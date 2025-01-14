@@ -55,38 +55,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((req, res, next) => {
-    console.log('Request Origin:', req.headers.origin);
-    console.log('Request Host:', req.headers.host);
-    next();
-});
-
-  
-app.use((req, res, next) => {
-    const allowedOrigin = ['https://streamizz.site']; 
-    const allowedHost =  ['streamify-o1ga.onrender.com', 'streamizz.site'];; 
-
-    const origin = req.headers.origin; // The Origin header of the request
-    const host = req.headers.host; // The Host header of the request
-    const referer = req.headers.referer; // The Referer header of the request (optional)
-
-    // 1. Validate Origin header
-    if (origin !== allowedOrigin) {
-        return res.status(403).json({ message: 'Forbidden: Invalid Origin' });
-    }
-
-    // 2. Validate Host header
-    if (host !== allowedHost) {
-        return res.status(403).json({ message: 'Forbidden: Invalid Host' });
-    }
-
-    // 3. Optionally validate Referer header
-    if (referer && !referer.startsWith(allowedOrigin)) {
-        return res.status(403).json({ message: 'Forbidden: Invalid Referer' });
-    }
-
-    next(); // Proceed to the next middleware or route
-});
 
 
 
