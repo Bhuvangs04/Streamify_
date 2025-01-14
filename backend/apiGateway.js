@@ -5,6 +5,7 @@ const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const cronJobs = require("./services/Clean");
+const helmet = require("helmet");
 
 // Route Handlers
 const user = require("./routes/User");
@@ -43,10 +44,10 @@ async function connectToDatabase(retries = 5) {
 app.use(express.json({ limit: "5gb" }));
 app.use(express.urlencoded({ limit: "5gb", extended: true }));
 app.use(cookieParser());
-
+app.use(helmet());
 // CORS Configuration
 const corsOptions = {
-  origin: ["https://streamify-o1ga.onrender.com"],
+  origin: ["https://streamify-o1ga.onrender.com","https://streamizz.site"],
   credentials: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: ["Content-Type", "Authorization"],
