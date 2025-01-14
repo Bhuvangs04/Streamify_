@@ -56,24 +56,32 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-  const allowedOrigins = ['https://streamizz.site'];
-  const allowedHosts = ['streamify-o1ga.onrender.com']; // This is the backend host, not the request origin
-  
-  const origin = req.headers.origin;
-  const host = req.headers.host;
-
-  // Check if the Origin is allowed
-  if (!allowedOrigins.includes(origin)) {
-    return res.status(403).json({ message: 'Forbidden' });
-  }
-
-  // Check if the Host header matches the allowed backend host
-  if (!allowedHosts.includes(host)) {
-    return res.status(403).json({ message: 'Forbidden' });
-  }
-
-  next(); // If both are valid, proceed to the next middleware or route
+    console.log('Request Origin:', req.headers.origin);
+    console.log('Request Host:', req.headers.host);
+    next();
 });
+
+
+const allowedOrigins = ['https://streamizz.site'];
+const allowedHosts = ['streamify-o1ga.onrender.com']; // Backend host
+
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    const host = req.headers.host;
+
+    // If the Origin header is present, validate it
+    if (origin && !allowedOrigins.includes(origin)) {
+        return res.status(403).json({ message: 'Forbidden: Invalid Origin' });
+    }
+
+    // Check if the Host header matches the allowed backend host
+    if (!allowedHosts.includes(host)) {
+        return res.status(403).json({ message: 'Forbidden: Invalid Host' });
+    }
+
+    next(); // Proceed if validation passes
+});
+
 
 
 // Serve Static Files with Headers
