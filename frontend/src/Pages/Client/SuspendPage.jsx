@@ -23,8 +23,7 @@ const Index = () => {
               <p className="text-sm text-gray-300 mb-2">
                 Please contact our support team for assistance:
               </p>
-                Mail to this address for any query :customer_care@streamizz.site 
-              </a>
+                <p>Mail to this address for any query :customer_care@streamizz.site </p>
             </div>
 
             <p className="text-sm text-gray-400">
