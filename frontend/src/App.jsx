@@ -40,13 +40,13 @@ function App() {
               }
             />
           ))}
-               <Route
+               <Route path="/login"
               element={ <LoginPage/>  }/>  
-            <Route
+            <Route path="/forget-page"
               element={ <Forget/>  }/> 
-            <Route
+            <Route path="/reset-password/:token"
               element={ <ResetPassword/>  }/> 
-            <Route
+            <Route path ="/signup"
               element={ <CreateAccountPage/>  }/> 
                 </Routes>
       </Router>
