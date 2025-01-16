@@ -41,14 +41,6 @@ import TransferPages from "@/Pages/Client/Transer";
 // Client routes array
 const ClientRoutes = [
   // Public routes
-  { path: PATHS.LOGIN, element: <LoginPage /> , isProtected: false},
-  { path: PATHS.FORGET, element: <Forget />, isProtected: false },
-  {
-    path: PATHS.RESET_PASSWORD,
-    element: <ResetPassword />,
-    isProtected: false,
-  },
-  { path: PATHS.SIGNUP, element: <CreateAccountPage />, isProtected: false },
   {
     path: PATHS.UNAUTHORIZED,
     element: <UnauthorizedPage />,
