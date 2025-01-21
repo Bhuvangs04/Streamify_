@@ -305,7 +305,7 @@ router.post("/login", async (req, res) => {
       httpOnly: true,
       secure: true,
       maxAge: 24 * 60 * 60 * 1000, // 1 day
-      sameSite: "None",
+      sameSite: "Lax",
     };
 
     return res
