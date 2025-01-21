@@ -14,7 +14,7 @@ const PaymentPlan = lazy(() => import("./PaymentPlan"));
 
 // Fetch user role
 const fetchUserRole = async () => {
-  const response = await axios.get("https://streamify-o1ga.onrender.com/api/user/getRole", {
+  const response = await axios.get("https://streamizz.site/api/user/getRole", {
     withCredentials: true,
   });
   return response.data;
@@ -22,7 +22,7 @@ const fetchUserRole = async () => {
 
 // Fetch available plans
 const fetchPlans = async () => {
-  const response = await axios.get("https://streamify-o1ga.onrender.com/api/payment/plans", {
+  const response = await axios.get("https://streamizz.site/api/payment/plans", {
     withCredentials: true,
   });
   return response.data.plans; // Return only the plans array
@@ -122,7 +122,7 @@ const PaymentPage = () => {
       );
 
       const response = await axios.post(
-        "https://streamify-o1ga.onrender.com/api/payment/order",
+        "https://streamizz.site/api/payment/order",
         {
           options: {
             amount: plan.price * 100,
@@ -152,7 +152,7 @@ const PaymentPage = () => {
         handler: async function (response) {
           try {
             const validationResponse = await axios.post(
-              "https://streamify-o1ga.onrender.com/api/payment/order/validate",
+              "https://streamizz.site/api/payment/order/validate",
               {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
