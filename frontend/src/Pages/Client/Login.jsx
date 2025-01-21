@@ -88,7 +88,7 @@ const LoginPage = () => {
 
       // Send login request with additional details
       const response = await axios.post(
-        "https://streamify-o1ga.onrender.com/api/netflix/login",
+        "https://streamizz.site/api/netflix/login",
         {
           data,
           hash,
@@ -99,7 +99,7 @@ const LoginPage = () => {
         if (response.data.message === "Login successful") {
           if (response.data.role === "user") {
             const streamingResponse = await axios.post(
-              "https://streamify-o1ga.onrender.com/api/user/start-streaming",
+              "https://streamizz.site/api/user/start-streaming",
               { deviceDetails: data.deviceDetails },
               { withCredentials: true }
             );
@@ -118,7 +118,7 @@ const LoginPage = () => {
             navigate("/users/statics");
           } else {
             const paymentResponse = await axios.get(
-              "https://streamify-o1ga.onrender.com/api/payment/check-payment",
+              "https://streamizz.site/api/payment/check-payment",
               { withCredentials: true }
             );
 
