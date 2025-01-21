@@ -14,7 +14,7 @@ const PaymentPlan = lazy(() => import("./PaymentPlan"));
 
 // Fetch user role
 const fetchUserRole = async () => {
-  const response = await axios.get("https://streamizz.site/api/user/getRole", {
+  const response = await axios.get("https://streamify-o1ga.onrender.com/api/user/getRole", {
     withCredentials: true,
   });
   return response.data;
@@ -22,7 +22,7 @@ const fetchUserRole = async () => {
 
 // Fetch available plans
 const fetchPlans = async () => {
-  const response = await axios.get("https://streamizz.site/api/payment/plans", {
+  const response = await axios.get("https://streamify-o1ga.onrender.com/api/payment/plans", {
     withCredentials: true,
   });
   return response.data.plans; // Return only the plans array
