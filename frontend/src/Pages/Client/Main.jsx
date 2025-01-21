@@ -8,7 +8,7 @@ import DeviceLimitModal from "./DeviceLimitModal";
 import CustomVideoPlayerPage from "@/components/VideoPlayer/CustomVideoPlayer";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE_URL = "https://streamify-o1ga.onrender.com";
+const API_BASE_URL = "https://streamizz.site";
 const MOVIES_API_URL = `${API_BASE_URL}/api/movies`;
 
 const fetchMovies = async () => {
