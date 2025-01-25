@@ -122,7 +122,7 @@ const PaymentPage = () => {
       );
 
       const response = await axios.post(
-        "https://streamizz.site/api/payment/order",
+        "https://streamify-o1ga.onrender.com/api/payment/order",
         {
           options: {
             amount: plan.price * 100,
@@ -152,7 +152,7 @@ const PaymentPage = () => {
         handler: async function (response) {
           try {
             const validationResponse = await axios.post(
-              "https://streamizz.site/api/payment/order/validate",
+              "https://streamify-o1ga.onrender.com/api/payment/order/validate",
               {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
