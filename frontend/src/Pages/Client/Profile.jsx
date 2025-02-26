@@ -25,18 +25,18 @@ import { useNavigate } from "react-router-dom";
 
 const fetchActiveDevices = async () => {
   const response = await axios.get(
-    "https://streamizz.site/api/user/active-devices"
+    "https://streamify-o1ga.onrender.com/api/user/active-devices"
   );
   return response.data; // Assumes response has { activeDevices, WatchBy }
 };
 
 const fetchUserRole = async () => {
-  const response = await axios.get("https://streamizz.site/api/user/getRole");
+  const response = await axios.get("https://streamify-o1ga.onrender.com/api/user/getRole");
   return response.data; // Assumes response has { role }
 };
 
 const fetchUserProfile = async () => {
-  const response = await axios.get("https://streamizz.site/api/user/profile");
+  const response = await axios.get("https://streamify-o1ga.onrender.com/api/user/profile");
   return response.data; // Assumes response has { message: "Success", userDetails }
 };
 
@@ -141,7 +141,7 @@ export default function ProfilePage() {
   const updatePassword = async () => {
     try {
       const response = await axios.post(
-        "https://streamizz.site/api/user/update/password",
+        "https://streamify-o1ga.onrender.com/api/user/update/password",
         { oldPassword: OldPassword, newPassword: NewPassword },
         { withCredentials: true }
       );
