@@ -33,9 +33,9 @@ router.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 const s3Client = new AWS.S3();
 
 const s3 = new AWS.S3({
-  accessKeyId: process.env.YOUR_ACCESS_KEY,
-  secretAccessKey: process.env.YOUR_SECRET_KEY,
-  region: process.env.YOUR_BUCKET_REGION,
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
 });
 
 
@@ -60,7 +60,7 @@ router.post(
       // Upload poster to S3
       const posterKey = `posters/${title}/${posterFile.originalname}`;
       const posterUploadParams = {
-        Bucket: process.env.YOUR_BUCKET_NAME,
+        Bucket: process.env.AWS_S3_BUCKET,
         Key: posterKey,
         Body: posterFile.buffer,
         ContentType: posterFile.mimetype,
