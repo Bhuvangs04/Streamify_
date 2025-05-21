@@ -89,13 +89,13 @@ const PaymentPage = () => {
 
   const handlePayment = async (plan) => {
     try {
-      if (userRoleData.user === "unBlocked") {
-        toast.info(
-          "You are already a subscription member. No payment is needed!",
-          { duration: 5000 }
-        );
-        return;
-      }
+      // if (userRoleData.user === "unBlocked") {
+      //   toast.info(
+      //     "You are already a subscription member. No payment is needed!",
+      //     { duration: 5000 }
+      //   );
+      //   return;
+      // }
 
       const ipDetails = await getUserDetails();
       const ip = ipDetails.ipDetails.ip;
@@ -147,7 +147,7 @@ const PaymentPage = () => {
         currency: "INR",
         name: "Mini Netflix",
         description: `Subscription Plan for ${plan.devices} device(s)`,
-        image: "https://example.com/your_logo",
+        image: "https://png.pngtree.com/png-clipart/20190921/original/pngtree-movie-board-icon-png-image_4751062.jpg",
         order_id: order.id,
         handler: async function (response) {
           try {
