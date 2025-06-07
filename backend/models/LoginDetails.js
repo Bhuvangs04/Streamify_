@@ -19,7 +19,7 @@ const loginDetailSchema = new mongoose.Schema({
   countryTld: { type: String, required: true }, // Country TLD
   continentCode: { type: String, required: true }, // Continent code
   inEu: { type: Boolean, required: true }, // Is in EU
-  postal: { type: String, required: true }, // Postal code
+  postal: { type: String, }, // Postal code
   latitude: { type: Number, required: true }, // Latitude of the user
   longitude: { type: Number, required: true }, // Longitude of the user
   timezone: { type: String, required: true }, // Timezone
